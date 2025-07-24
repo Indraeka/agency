@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- IMPORTANT: This is for demonstration ONLY ---
             // In a real application, you would send these credentials to a server
             // for authentication. This client-side check is NOT secure.
-            if (username === 'testuser' && password === 'testpass') {
+            if (username === 'admin' && password === 'intake') {
                 alert('Login successful! Redirecting to questionnaire...');
                 window.location.href = 'questionnaire.html'; // Redirect to the questionnaire page
             } else {
