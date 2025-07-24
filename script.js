@@ -8,10 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const username = loginForm.username.value;
             const password = loginForm.password.value;
 
+            const validUsername = "admin";
+            const validPassword = "intake";
+
             // --- IMPORTANT: This is for demonstration ONLY ---
             // In a real application, you would send these credentials to a server
             // for authentication. This client-side check is NOT secure.
-            if (username === 'admin' && password === 'intake') {
+            if (username === validUsername && password === validPassword) {
                 alert('Login successful! Redirecting to questionnaire...');
                 window.location.href = 'questionnaire.html'; // Redirect to the questionnaire page
             } else {
