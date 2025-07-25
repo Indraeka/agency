@@ -1,0 +1,192 @@
+body, h1, h2, h3, h4, h5, h6, input, textarea, button, .contact-info, .contact-form, .questionnaire-form {
+    font-family: 'Alumni Sans Pinstripe', Arial, sans-serif;
+}
+body {
+    background: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.contact-wrapper {
+    display: flex;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    overflow: hidden;
+    max-width: 800px;
+    width: 100%;
+}
+.contact-wrapper {
+    display: flex;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    overflow: hidden;
+    max-width: 800px;
+    width: 100%;
+}
+.questionnaire-wrapper {
+    display: flex;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    overflow: hidden;
+    max-width: 800px;
+    width: 100%;
+}
+.contact-form {
+    max-width: 320px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+.contact-form h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 600;
+}
+.questionnaire-form {
+    max-width: 550px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+.questionnaire-form h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 600;
+}
+.questionnaire-form label {
+    font-size: 1.35em;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+}
+.form-group {
+    display: flex;
+    gap: 15px;
+}
+.form-group input {
+    flex: 1;
+}
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 16px;
+    background: #fafafa;
+    resize: none;
+}
+.contact-form textarea {
+    min-height: 100px;
+}
+.contact-form button {
+    background: #3086f7;
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(48,134,247,0.08);
+    transition: background 0.2s;
+}
+.contact-form button:hover {
+    background: #256fd1;
+}
+.questionnaire-form input,
+.questionnaire-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 16px;
+    background: #fafafa;
+    resize: none;
+}
+.questionnaire-form textarea {
+    min-height: 100px;
+}
+.questionnaire-form button {
+    background: #3086f7;
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(48,134,247,0.08);
+    transition: background 0.2s;
+}
+.questionnaire-form button:hover {
+    background: #256fd1;
+}
+.contact-info {
+    background: #3086f7;
+    color: #fff;
+    padding: 40px 30px;
+    flex: 1 1 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.contact-info h3 {
+    margin-bottom: 25px;
+    font-size: px;
+    font-weight: 600;
+}
+.info-item {
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+.info-item span {
+    font-size: 23px;
+    line-height: 1.2;
+}
+.info-item strong {
+    display: block;
+    font-weight: 600;
+}
+h1 {
+    font-size: 36px; /* or try 2.5em, 3rem, etc. */
+    /* You can add more styles here */
+}
+.contact-info h1 {
+    font-size: 70px;
+}
+.contact-form input,
+.contact-form button {
+    box-sizing: border-box;
+    width: 100%;
+}
+.logo-img {
+    display: block;
+    margin: 0 auto 20px auto;
+    max-width: 90px;
+    height: auto;
+}
+@media (max-width: 800px) {
+    .contact-wrapper {
+        flex-direction: column;
+        max-width: 95vw;
+    }
+    .questionnaire-wrapper {
+        flex-direction: column;
+        max-width: 95vw;
+    }
+    .contact-info, .contact-form {
+        padding: 30px 15px;
+    }
+}

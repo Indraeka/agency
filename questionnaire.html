@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Intake Questionnaire</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="questionnaire-wrapper">
+            <form class="questionnaire-form" id="questionnaireForm" action="https://formspree.io/f/xqalqeav" method="POST">
+                <img src="Alogo.png" alt="Logo" class="logo-img">
+                <h2>Intake Questionnaire</h2>
+                <div class="question-group">
+                    <label for="q1">1. Business Overview<br><small>Can you describe your business, products/services, and target audience?</small></label>
+                    <textarea id="q1" name="businessOverview" rows="3" required></textarea>
+                </div>
+                <div class="question-group">
+                    <label for="q2">2. Goals & Objectives<br><small>What are your primary goals for this campaign? (e.g., brand awareness, lead generation, sales)</small></label>
+                    <textarea id="q2" name="goalsObjectives" rows="2" required></textarea>
+                </div>
+                <div class="question-group">
+                    <label for="q3">3. Target Audience<br><small>Who are your ideal customers? (demographics, interests, behaviors)</small></label>
+                    <textarea id="q3" name="targetAudience" rows="2" required></textarea>
+                </div>
+                <div class="question-group">
+                    <label for="q4">4. Current Marketing Efforts<br><small>What marketing channels are you currently using, and what has/hasn’t worked so far?</small></label>
+                    <textarea id="q4" name="currentMarketing" rows="2" required></textarea>
+                </div>
+                <div class="question-group">
+                    <label for="q5">5. Budget & Timeline<br><small>What is your budget range and desired timeline for this project or campaign?</small></label>
+                    <textarea id="q5" name="budgetTimeline" rows="2" required></textarea>
+                </div>
+                <div class="question-group">
+                    <label for="q6">6. Brand Identity<br><small>Do you have existing brand guidelines (logo, colors, tone of voice) we should follow?</small></label>
+                    <textarea id="q6" name="brandIdentity" rows="2" required></textarea>
+                </div>
+                <div class="question-group">
+                    <label for="q7">7. Key Performance Indicators (KPIs)<br><small>How will you define success for this campaign? (e.g., click-through rates, conversions, revenue growth)</small></label>
+                    <textarea id="q7" name="kpis" rows="2" required></textarea>
+                </div>
+                <input type="hidden" name="_replyto" value="indraeka@gmail.com">
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html> 
