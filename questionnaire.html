@@ -12,39 +12,188 @@
         <div class="questionnaire-wrapper">
             <form class="questionnaire-form" id="questionnaireForm" action="https://formspree.io/f/xqalqeav" method="POST">
                 <img src="Alogo.png" alt="Logo" class="logo-img">
-                <h2>Intake Questionnaire</h2>
+                <h1>Intake Questionnaire</h1>
                 <div class="question-group">
-                    <label for="q1">1. Business Overview<br><small>Can you describe your business, products/services, and target audience?</small></label>
-                    <textarea id="q1" name="businessOverview" rows="3" required></textarea>
+                    <label for="confirmation_code">Confirmation Code<br></label>
+                    <input type="text" id="confirmation_code" name="Confirmation Code" placeholder="Enter your 7-digit confirmation code" maxlength="7" required>
                 </div>
                 <div class="question-group">
-                    <label for="q2">2. Goals & Objectives<br><small>What are your primary goals for this campaign? (e.g., brand awareness, lead generation, sales)</small></label>
-                    <textarea id="q2" name="goalsObjectives" rows="2" required></textarea>
+                    <label for="q1">1. Company Overview<br><span class="medium">Tell us who you are and what your business does.<br></span></label>
+                    <textarea id="q1" name="Company Overview" placeholder="What makes your brand or product unique?" required></textarea>
                 </div>
                 <div class="question-group">
-                    <label for="q3">3. Target Audience<br><small>Who are your ideal customers? (demographics, interests, behaviors)</small></label>
-                    <textarea id="q3" name="targetAudience" rows="2" required></textarea>
+                    <label for="q2">2. Project Goals<br><span class="medium">What are you aiming to achieve?<br></span></label>
+                    <textarea id="q2" name="Project Goals" placeholder="Examples: drive conversions, build awareness, launch a new product, reposition the brand, etc." rows="3" required></textarea>
                 </div>
                 <div class="question-group">
-                    <label for="q4">4. Current Marketing Efforts<br><small>What marketing channels are you currently using, and what has/hasn’t worked so far?</small></label>
-                    <textarea id="q4" name="currentMarketing" rows="2" required></textarea>
+                    <label for="q3">3. Target Audience<br><span class="medium">Who is the creative speaking to?<br></span></label>
+                    <textarea id="q3" name="Target Audience" placeholder="Include demographics, psychographics, behavior, or audience segments." rows="3" required></textarea>
                 </div>
                 <div class="question-group">
-                    <label for="q5">5. Budget & Timeline<br><small>What is your budget range and desired timeline for this project or campaign?</small></label>
-                    <textarea id="q5" name="budgetTimeline" rows="2" required></textarea>
+                    <label for="q4">4. Key Messages<br><span class="medium">What must the audience take away from this creative?<br></span></label>
+                    <textarea id="q4" name="Key Messages" placeholder="List 2–3 core messages or CTAs. Include any specific taglines, disclaimers, or mandatory elements." rows="3" required></textarea>
                 </div>
                 <div class="question-group">
-                    <label for="q6">6. Brand Identity<br><small>Do you have existing brand guidelines (logo, colors, tone of voice) we should follow?</small></label>
-                    <textarea id="q6" name="brandIdentity" rows="2" required></textarea>
+                    <label for="q5">5. Tone &amp; Style<br><span class="medium">How should it feel? Examples: Bold, premium, humorous, cinematic, honest, quirky, etc.<br></span></label>
+                    <textarea id="q5" name="Tone Style" placeholder="Are there any visual references or links you’d like to share?" rows="3" required></textarea>
                 </div>
                 <div class="question-group">
-                    <label for="q7">7. Key Performance Indicators (KPIs)<br><small>How will you define success for this campaign? (e.g., click-through rates, conversions, revenue growth)</small></label>
-                    <textarea id="q7" name="kpis" rows="2" required></textarea>
+                    <label for="q6">6. Creative Approach (Optional)<br><span class="medium">We offer a mix of AI-generated, influencer-led, and traditional creative approaches. Let us know your preferences.</span></label>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q6_ai" name="Creative Approach" value="Open to AI-generated content where it fits">
+                        <label for="q6_ai">Open to AI-generated content where it fits</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q6_human" name="Creative Approach" value="Prefer a fully human-led approach">
+                        <label for="q6_human">Prefer a fully human-led approach</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q6_mix" name="Creative Approach" value="Prefer a mix of both">
+                        <label for="q6_mix">Prefer a mix of both</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q6_not_sure" name="Creative Approach" value="Not sure – open to recommendations">
+                        <label for="q6_not_sure">Not sure – open to recommendations</label>
+                    </div>
+                    <label for="q6_notes">Other notes on creative approach?</label>
+                    <textarea id="q6_notes" name="Creative Approach Notes" rows="2"></textarea>
                 </div>
-                <input type="hidden" name="_replyto" value="indraeka@gmail.com">
+                <div class="question-group">
+                    <label for="q7">7. Platforms &amp; Channels<br><span class="medium">Where will this creative live? Check all that apply and add details if needed.</span></label>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q7_fb" name="Platforms Channels" value="Facebook / Instagram">
+                        <label for="q7_fb">Facebook / Instagram</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q7_tiktok" name="Platforms Channels" value="TikTok">
+                        <label for="q7_tiktok">TikTok</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q7_yt" name="Platforms Channels" value="YouTube">
+                        <label for="q7_yt">YouTube</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q7_display" name="Platforms Channels" value="Display / Programmatic">
+                        <label for="q7_display">Display / Programmatic</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q7_web" name="Platforms Channels" value="Website / Landing Page">
+                        <label for="q7_web">Website / Landing Page</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q7_email" name="Platforms Channels" value="Email">
+                        <label for="q7_email">Email</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q7_tv" name="Platforms Channels" value="TV (Broadcast or OTT)">
+                        <label for="q7_tv">TV (Broadcast or OTT)</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q7_store" name="Platforms Channels" value="In-store / Retail Screens">
+                        <label for="q7_store">In-store / Retail Screens</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q7_other" name="Platforms Channels" value="Other">
+                        <label for="q7_other">Other:</label>
+                    </div>
+                    <div style="margin-bottom: 5px;">
+                        <input type="text" name="Platforms Channels Other" placeholder="Please specify" style="width:100%; box-sizing:border-box;">
+                    </div>
+                    <label>Do you need cutdowns or versions by platform (e.g. 30s/15s/6s)?</label>
+                    <div class="radio-option">
+                        <input type="radio" id="q7_cutdowns_yes" name="Cutdowns Needed" value="Yes">
+                        <label for="q7_cutdowns_yes">Yes</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="q7_cutdowns_no" name="Cutdowns Needed" value="No">
+                        <label for="q7_cutdowns_no">No</label>
+                    </div>
+                    <div style="margin-top: 6px;">
+                        <input type="text" name="Cutdowns Details" placeholder="Please specify" style="width:100%; box-sizing:border-box;">
+                    </div>
+                </div>
+                <div class="question-group">
+                    <label for="q8">8. Deliverables<br><span class="medium">What do you need us to create? Be specific about quantity, format, duration, and orientation.<br>(Feel free to attach a spreadsheet or doc if that’s easier.)</span></label>
+                    <textarea id="q8" name="Deliverables" rows="3" required></textarea>
+                </div>
+                <div class="question-group">
+                    <label for="q9">9. Timeline<br><span class="medium">When do you need first drafts?<br></span></label>
+                    <textarea id="q9" name="Timeline" placeholder="Are there any hard deadlines or launch dates we should plan around?" rows="2" required></textarea>
+                </div>
+                <div class="question-group">
+                    <label for="q10">10. Existing Materials<br><span class="medium">Do you have any of the following?</span></label>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q10_guidelines" name="Existing Materials" value="Brand guidelines">
+                        <label for="q10_guidelines">Brand guidelines</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q10_logos" name="Existing Materials" value="Logos / Fonts / Templates">
+                        <label for="q10_logos">Logos / Fonts / Templates</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q10_past" name="Existing Materials" value="Past campaigns or creative to reference">
+                        <label for="q10_past">Past campaigns or creative to reference</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q10_shots" name="Existing Materials" value="Product shots or B-roll">
+                        <label for="q10_shots">Product shots or B-roll</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q10_copy" name="Existing Materials" value="Copy points or messaging frameworks">
+                        <label for="q10_copy">Copy points or messaging frameworks</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="q10_other" name="Existing Materials" value="Other">
+                        <label for="q10_other">Other:</label>
+                    </div>
+                    <div style="margin-bottom: 5px;">
+                        <input type="text" name="Existing Materials Other" placeholder="Please specify" style="width:100%; box-sizing:border-box;">
+                    </div>
+                    <label>Please share via link or upload.</label>
+                    <input type="text" name="Materials Link" placeholder="Link to materials">
+                </div>
+                <div class="question-group">
+                    <label for="q11">11. Stakeholders &amp; Approvals<br><span class="medium">Who will be involved in reviewing and approving the work?<br></span></label>
+                    <textarea id="q11" name="Stakeholders Approvals" placeholder="Are there specific internal milestones or legal steps we should factor in?" rows="2" required></textarea>
+                </div>
+                <div class="question-group">
+                    <label for="q12">12. Budget (Optional)<br><span class="medium">If you have a budget range, feel free to share it here. It helps us scope realistically.</span></label>
+                    <input type="text" id="q12" name="Budget" placeholder="Budget: $_________ (or ballpark)">
+                    <label for="q12_comments">Comments:</label>
+                    <textarea id="q12_comments" name="Budget Comments" rows="2"></textarea>
+                </div>
+                <div class="question-group">
+                    <label for="q13">13. Anything Else?<br><span class="medium">Other background, blockers, sensitivities, or ideas we should know about?</span></label>
+                    <textarea id="q13" name="Anything Else" rows="2"></textarea>
+                </div>
+                <input type="hidden" name="First Name" id="hidden_firstname">
+                <input type="hidden" name="Last Name" id="hidden_lastname">
+                <input type="hidden" name="Email Address" id="hidden_email">
                 <button type="submit">Submit</button>
             </form>
         </div>
     </div>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('questionnaireForm');
+    if (form) {
+        // Fill hidden fields from localStorage
+        document.getElementById('hidden_firstname').value = localStorage.getItem('registration_firstname') || '';
+        document.getElementById('hidden_lastname').value = localStorage.getItem('registration_lastname') || '';
+        document.getElementById('hidden_email').value = localStorage.getItem('registration_email') || '';
+
+        form.addEventListener('submit', function(event) {
+            var codeInput = document.getElementById('confirmation_code');
+            var enteredCode = codeInput.value.trim();
+            var storedCode = localStorage.getItem('confirmation_code');
+            if (enteredCode !== storedCode) {
+                event.preventDefault();
+                alert('The confirmation code you entered is incorrect. Please check your code and try again.');
+                codeInput.focus();
+            }
+        });
+    }
+});
+</script>
 </body>
 </html> 
