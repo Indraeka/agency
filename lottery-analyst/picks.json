@@ -1,0 +1,510 @@
+{
+  "lottomax": {
+    "game": "Lotto Max",
+    "next_draw": "2026-11-10",
+    "draws_analysed": 313,
+    "data_range": [
+      "2023-11-10",
+      "2026-11-06"
+    ],
+    "pool": 52,
+    "jackpot_odds": 133784560,
+    "set_a_pattern": [
+      6,
+      23,
+      30,
+      36,
+      41,
+      43,
+      50
+    ],
+    "set_b_anticrowd": [
+      38,
+      40,
+      42,
+      45,
+      49,
+      51,
+      52
+    ],
+    "tests": [
+      {
+        "key": "chi2",
+        "label": "Frequency chi-square (are some numbers favoured?)",
+        "observed": 28.606809794975067,
+        "null_mean": 44.70874175833222,
+        "null_lo": 29.16088270316778,
+        "null_hi": 63.18492766950768,
+        "p": 0.0415
+      },
+      {
+        "key": "max_abs_z",
+        "label": "Most extreme hot/cold number, |z|",
+        "observed": 2.2054842583166305,
+        "null_mean": 2.532413123093222,
+        "null_lo": 1.8786713624074125,
+        "null_hi": 3.513741420094686,
+        "p": 0.432
+      },
+      {
+        "key": "repeat_prev",
+        "label": "Numbers repeated from previous draw (avg)",
+        "observed": 1.0192307692307692,
+        "null_mean": 0.9718309294871794,
+        "null_lo": 0.8782051282051282,
+        "null_hi": 1.0673076923076923,
+        "p": 0.351
+      },
+      {
+        "key": "max_pair",
+        "label": "Most frequent pair, times drawn together",
+        "observed": 15.0,
+        "null_mean": 14.17075,
+        "null_lo": 12.0,
+        "null_hi": 17.0,
+        "p": 0.6585
+      },
+      {
+        "key": "mean_sum",
+        "label": "Average sum of main numbers",
+        "observed": 180.31309904153355,
+        "null_mean": 179.82498722044727,
+        "null_lo": 175.8753194888179,
+        "null_hi": 183.7924121405751,
+        "p": 0.812
+      },
+      {
+        "key": "sd_sum",
+        "label": "Spread (SD) of sums",
+        "observed": 34.99727585445762,
+        "null_mean": 36.07864126480269,
+        "null_lo": 33.4099820673981,
+        "null_hi": 38.736398680442164,
+        "p": 0.43
+      },
+      {
+        "key": "mean_odd",
+        "label": "Average count of odd numbers",
+        "observed": 3.3865814696485623,
+        "null_mean": 3.500391373801917,
+        "null_lo": 3.3610223642172525,
+        "null_hi": 3.635782747603834,
+        "p": 0.1055
+      },
+      {
+        "key": "consecutive_rate",
+        "label": "Share of draws with a consecutive pair",
+        "observed": 0.5942492012779552,
+        "null_mean": 0.6130710862619808,
+        "null_lo": 0.5591054313099042,
+        "null_hi": 0.6677316293929713,
+        "p": 0.5345
+      }
+    ],
+    "backtest": [
+      {
+        "strategy": "hot",
+        "draws": 213,
+        "mean_matches": 0.9812206572769953,
+        "expected_random": 0.9693824485373781,
+        "z": 0.20167136753928513,
+        "best_single_ticket": 4
+      },
+      {
+        "strategy": "cold",
+        "draws": 213,
+        "mean_matches": 1.0751173708920188,
+        "expected_random": 0.9693824485373781,
+        "z": 1.8012612259960965,
+        "best_single_ticket": 4
+      },
+      {
+        "strategy": "overdue",
+        "draws": 213,
+        "mean_matches": 0.9812206572769953,
+        "expected_random": 0.9693824485373781,
+        "z": 0.20167136753928513,
+        "best_single_ticket": 3
+      },
+      {
+        "strategy": "ensemble",
+        "draws": 213,
+        "mean_matches": 0.9436619718309859,
+        "expected_random": 0.9693824485373781,
+        "z": -0.43816457584343904,
+        "best_single_ticket": 4
+      }
+    ],
+    "hot": [
+      [
+        6,
+        54,
+        1.7162704925939867
+      ],
+      [
+        36,
+        53,
+        1.5528640446393775
+      ],
+      [
+        7,
+        51,
+        1.2260511487301595
+      ],
+      [
+        28,
+        51,
+        1.2260511487301595
+      ],
+      [
+        43,
+        51,
+        1.2260511487301595
+      ],
+      [
+        22,
+        50,
+        1.0626447007755504
+      ],
+      [
+        30,
+        49,
+        0.8992382528209414
+      ],
+      [
+        34,
+        49,
+        0.8992382528209414
+      ]
+    ],
+    "cold": [
+      [
+        17,
+        30,
+        -2.2054842583166305
+      ],
+      [
+        42,
+        35,
+        -1.3884520185435854
+      ],
+      [
+        27,
+        35,
+        -1.3884520185435854
+      ],
+      [
+        26,
+        37,
+        -1.0616391226343673
+      ],
+      [
+        15,
+        38,
+        -0.8982326746797582
+      ],
+      [
+        13,
+        38,
+        -0.8982326746797582
+      ],
+      [
+        49,
+        39,
+        -0.7348262267251492
+      ],
+      [
+        47,
+        39,
+        -0.7348262267251492
+      ]
+    ],
+    "overdue": [
+      [
+        27,
+        29
+      ],
+      [
+        3,
+        28
+      ],
+      [
+        9,
+        25
+      ],
+      [
+        18,
+        17
+      ],
+      [
+        45,
+        16
+      ],
+      [
+        40,
+        15
+      ],
+      [
+        44,
+        15
+      ],
+      [
+        14,
+        14
+      ]
+    ]
+  },
+  "lotto649": {
+    "game": "Lotto 6/49",
+    "next_draw": "2026-11-11",
+    "draws_analysed": 313,
+    "data_range": [
+      "2023-11-11",
+      "2026-11-07"
+    ],
+    "pool": 49,
+    "jackpot_odds": 13983816,
+    "set_a_pattern": [
+      9,
+      17,
+      28,
+      37,
+      41,
+      42
+    ],
+    "set_b_anticrowd": [
+      30,
+      34,
+      40,
+      44,
+      48,
+      49
+    ],
+    "tests": [
+      {
+        "key": "chi2",
+        "label": "Frequency chi-square (are some numbers favoured?)",
+        "observed": 33.626198083066974,
+        "null_mean": 42.883675718849695,
+        "null_lo": 27.31203407880715,
+        "null_hi": 61.38895101171438,
+        "p": 0.2735
+      },
+      {
+        "key": "max_abs_z",
+        "label": "Most extreme hot/cold number, |z|",
+        "observed": 2.185292516034728,
+        "null_mean": 2.507175370728509,
+        "null_lo": 1.7806087167690787,
+        "null_hi": 3.5647364230969214,
+        "p": 0.591
+      },
+      {
+        "key": "repeat_prev",
+        "label": "Numbers repeated from previous draw (avg)",
+        "observed": 0.7371794871794872,
+        "null_mean": 0.7355480769230769,
+        "null_lo": 0.6538461538461539,
+        "null_hi": 0.8205128205128205,
+        "p": 0.993
+      },
+      {
+        "key": "max_pair",
+        "label": "Most frequent pair, times drawn together",
+        "observed": 11.0,
+        "null_mean": 11.907,
+        "null_lo": 10.0,
+        "null_hi": 14.0,
+        "p": 0.778
+      },
+      {
+        "key": "mean_sum",
+        "label": "Average sum of main numbers",
+        "observed": 150.8817891373802,
+        "null_mean": 150.03785463258785,
+        "null_lo": 146.4564696485623,
+        "null_hi": 153.69656549520766,
+        "p": 0.644
+      },
+      {
+        "key": "sd_sum",
+        "label": "Spread (SD) of sums",
+        "observed": 32.04961340613477,
+        "null_mean": 32.73030754087415,
+        "null_lo": 30.339847010612644,
+        "null_hi": 35.19706200458909,
+        "p": 0.5875
+      },
+      {
+        "key": "mean_odd",
+        "label": "Average count of odd numbers",
+        "observed": 3.1182108626198084,
+        "null_mean": 3.0617188498402554,
+        "null_lo": 2.9329073482428116,
+        "null_hi": 3.191693290734824,
+        "p": 0.407
+      },
+      {
+        "key": "consecutive_rate",
+        "label": "Share of draws with a consecutive pair",
+        "observed": 0.49201277955271566,
+        "null_mean": 0.494797124600639,
+        "null_lo": 0.44089456869009586,
+        "null_hi": 0.5527156549520766,
+        "p": 0.9625
+      }
+    ],
+    "backtest": [
+      {
+        "strategy": "hot",
+        "draws": 213,
+        "mean_matches": 0.7605633802816901,
+        "expected_random": 0.7346938775510206,
+        "z": 0.49679232203463325,
+        "best_single_ticket": 3
+      },
+      {
+        "strategy": "cold",
+        "draws": 213,
+        "mean_matches": 0.7652582159624414,
+        "expected_random": 0.7346938775510206,
+        "z": 0.5869509286261055,
+        "best_single_ticket": 3
+      },
+      {
+        "strategy": "overdue",
+        "draws": 213,
+        "mean_matches": 0.7230046948356808,
+        "expected_random": 0.7346938775510206,
+        "z": -0.22447653069713489,
+        "best_single_ticket": 3
+      },
+      {
+        "strategy": "ensemble",
+        "draws": 213,
+        "mean_matches": 0.7370892018779343,
+        "expected_random": 0.7346938775510206,
+        "z": 0.04599928907727789,
+        "best_single_ticket": 3
+      }
+    ],
+    "hot": [
+      [
+        39,
+        51,
+        2.185292516034728
+      ],
+      [
+        9,
+        48,
+        1.6680010508864052
+      ],
+      [
+        42,
+        47,
+        1.4955705625036309
+      ],
+      [
+        28,
+        45,
+        1.1507095857380825
+      ],
+      [
+        41,
+        45,
+        1.1507095857380825
+      ],
+      [
+        46,
+        45,
+        1.1507095857380825
+      ],
+      [
+        49,
+        45,
+        1.1507095857380825
+      ],
+      [
+        15,
+        43,
+        0.8058486089725342
+      ]
+    ],
+    "cold": [
+      [
+        47,
+        27,
+        -1.9530392051518528
+      ],
+      [
+        24,
+        28,
+        -1.7806087167690787
+      ],
+      [
+        19,
+        29,
+        -1.6081782283863044
+      ],
+      [
+        43,
+        30,
+        -1.4357477400035303
+      ],
+      [
+        31,
+        30,
+        -1.4357477400035303
+      ],
+      [
+        38,
+        33,
+        -0.9184562748552076
+      ],
+      [
+        6,
+        33,
+        -0.9184562748552076
+      ],
+      [
+        32,
+        34,
+        -0.7460257864724334
+      ]
+    ],
+    "overdue": [
+      [
+        40,
+        43
+      ],
+      [
+        44,
+        28
+      ],
+      [
+        2,
+        21
+      ],
+      [
+        30,
+        21
+      ],
+      [
+        24,
+        20
+      ],
+      [
+        6,
+        19
+      ],
+      [
+        34,
+        18
+      ],
+      [
+        14,
+        17
+      ]
+    ]
+  }
+}
