@@ -4,11 +4,24 @@ Downloads three years of draw results, tests them for patterns, back-tests
 number-picking strategies, and prints two sets of numbers per game for the next draw.
 
 ```
-python3 fetch.py      # refresh data/*.csv (needs network; numpy not required)
+python3 app.py        # web interface at http://127.0.0.1:8649
+```
+
+The page has two buttons:
+
+- **Refresh results** downloads any draws published since the last one on file and adds them to `data/*.csv`.
+- **Generate numbers** produces Set A and Set B for the next draw of each game. Press it again for an alternative pair.
+
+Each generated pair is saved to `history.json` and scored in the track record once its draw is published.
+
+The same steps from the command line:
+
+```
+python3 fetch.py      # add new draws (--full re-downloads everything)
 python3 analyze.py    # writes report.md + picks.json, prints the picks
 ```
 
-Requires Python 3.10+ and `numpy`.
+Requires Python 3.10+ and `numpy`. Refreshing needs network access.
 
 ## What it does
 
@@ -17,6 +30,7 @@ Requires Python 3.10+ and `numpy`.
 | Collect | `fetch.py` | Scrapes lotteryextreme.com month by month for both games. Every Lotto Max draw is cross-checked against lottomaxnumbers.com; a missing scheduled draw or a disagreement fails the run. |
 | Observe | `analyze.py` | Frequency, hot/cold, overdue, pairs, sums, odd/even, consecutive numbers, repeats. Each statistic is compared with thousands of simulated fair-draw histories. |
 | Learn | `analyze.py` | Walk-forward back-test of hot / cold / overdue / ensemble strategies against the random expectation. |
+| Interface | `app.py`, `ui.html` | Local web server and page that call the code above. Nothing is sent anywhere except the results download. |
 | Pick | `analyze.py` | Set A: best ensemble score with a typical shape. Set B: numbers human players under-pick (reduces prize sharing), no overlap with A. |
 
 ## Limits

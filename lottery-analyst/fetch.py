@@ -8,7 +8,8 @@ Sources (both public results archives; OLG itself publishes no bulk export):
 Every Lotto Max draw is compared across the two sources; any disagreement is
 printed and the run fails, so a scraping bug cannot silently poison the data.
 
-Usage:  python3 fetch.py [--years 3]
+Usage:  python3 fetch.py            add draws published since the last run
+        python3 fetch.py --full     re-download the whole history
 """
 from __future__ import annotations
 
@@ -76,7 +77,6 @@ def fetch_lotteryextreme(game: str, start: dt.date, end: dt.date) -> dict:
                 raise ValueError(f"{game} {date}: unexpected balls {main} + {bonus}")
             draws[date] = (sorted(main), bonus[0])
             found += 1
-        print(f"  {game} {ym}: {found} draws")
         time.sleep(0.4)
     return draws
 
@@ -99,7 +99,11 @@ def fetch_lottomaxnumbers(start: dt.date, end: dt.date) -> dict:
 
 
 def validate(game: str, draws: dict, start: dt.date, end: dt.date) -> list[str]:
-    """Return a list of problems (empty = clean)."""
+    """Return a list of problems (empty = clean).
+
+    A scheduled draw from the last two days that is not listed yet is treated
+    as "not published yet", not as a problem.
+    """
     _, _, weekdays = GAMES[game]
     problems = []
     for date, (main, bonus) in draws.items():
@@ -108,11 +112,62 @@ def validate(game: str, draws: dict, start: dt.date, end: dt.date) -> list[str]:
         if dt.date.fromisoformat(date).weekday() not in weekdays:
             problems.append(f"{date}: not a scheduled draw day")
     day = start
-    while day <= end:
+    while day <= end - dt.timedelta(days=2):
         if day.weekday() in weekdays and day.isoformat() not in draws:
             problems.append(f"{day}: scheduled draw missing")
         day += dt.timedelta(days=1)
     return problems
+
+
+def read_csv(game: str) -> dict:
+    path = DATA / f"{game}.csv"
+    if not path.exists():
+        return {}
+    n_main = GAMES[game][1]
+    with path.open() as fh:
+        return {
+            r["date"]: ([int(r[f"n{i}"]) for i in range(1, n_main + 1)], int(r["bonus"]))
+            for r in csv.DictReader(fh)
+        }
+
+
+def refresh(years: int = 3, log=print) -> dict:
+    """Add draws published since the last one on file. Returns a summary per game.
+
+    Only the months from the last stored draw to today are downloaded. New
+    Lotto Max draws are cross-checked against the second source. If anything
+    looks wrong the CSV for that game is left untouched.
+    """
+    end = dt.date.today()
+    summary = {}
+    for game in GAMES:
+        have = read_csv(game)
+        if have:
+            start, since = dt.date.fromisoformat(min(have)), dt.date.fromisoformat(max(have))
+        else:
+            start = since = end.replace(year=end.year - years)
+        log(f"{game}: checking {since} .. {end}")
+        got = fetch_lotteryextreme(game, since, end)
+        new = {d: v for d, v in got.items() if d not in have and d <= end.isoformat()}
+        problems = [f"{d}: differs from stored result" for d in got if d in have and got[d] != have[d]]
+        merged = {**have, **new}
+        problems += validate(game, merged, start, end)
+        if game == "lottomax" and new:
+            other = fetch_lottomaxnumbers(dt.date.fromisoformat(min(new)), end)
+            problems += [f"{d}: sources disagree" for d in new if d in other and other[d] != new[d]]
+            unverified = [d for d in new if d not in other]
+        else:
+            unverified = []
+        if new and not problems:
+            write_csv(game, merged)
+        summary[game] = {
+            "added": [{"date": d, "main": new[d][0], "bonus": new[d][1]} for d in sorted(new)],
+            "saved": bool(new) and not problems,
+            "total": len(merged) if not problems else len(have),
+            "problems": problems,
+            "unverified": unverified,
+        }
+    return summary
 
 
 def write_csv(game: str, draws: dict) -> Path:
@@ -128,14 +183,10 @@ def write_csv(game: str, draws: dict) -> Path:
     return path
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--years", type=int, default=3)
-    args = ap.parse_args()
+def full_download(years: int) -> bool:
     end = dt.date.today()
-    start = end.replace(year=end.year - args.years)
+    start = end.replace(year=end.year - years)
     ok = True
-
     for game in GAMES:
         print(f"Fetching {game} {start} .. {end}")
         draws = {
@@ -160,6 +211,24 @@ def main() -> int:
         for p in problems:
             print(f"  PROBLEM {p}")
         ok &= not problems
+    return ok
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--years", type=int, default=3)
+    ap.add_argument("--full", action="store_true", help="re-download everything instead of only new draws")
+    args = ap.parse_args()
+    if args.full:
+        return 0 if full_download(args.years) else 1
+    ok = True
+    for game, s in refresh(args.years).items():
+        print(f"{game}: +{len(s['added'])} new draws, {s['total']} on file")
+        for d in s["added"]:
+            print(f"  {d['date']}  {d['main']} + {d['bonus']}")
+        for p in s["problems"]:
+            print(f"  PROBLEM {p}")
+        ok &= not s["problems"]
     return 0 if ok else 1
 
 

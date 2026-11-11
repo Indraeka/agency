@@ -1,77 +1,77 @@
 # OLG Lotto Max & Lotto 6/49 - analyst report
 
-Generated 2026-11-09 by `analyze.py` from `data/*.csv` (refresh with `fetch.py`).
+Generated 2026-11-11 by `analyze.py` from `data/*.csv` (refresh with `fetch.py`).
 
 **Read this first.** Of 16 pattern statistics, 1 fall outside the fair-draw range at p<0.05 (about 0.8 expected from noise alone): Lotto Max: Frequency chi-square (are some numbers favoured?) (p=0.04). No strategy back-tests better than chance. Unless a strategy is flagged above, Set A has the same chance of winning as any other ticket. Set B also has the same chance of winning, but is built so that a win is less likely to be split.
 
 ## Lotto Max
 
-- Draws analysed: **313** (2023-11-10 to 2026-11-06), 7 main numbers from 1-52
+- Draws analysed: **314** (2023-11-10 to 2026-11-10), 7 main numbers from 1-52
 - Pool changed from 50 to 52 numbers on 2026-04-14; all statistics are exposure-adjusted for it
 - Jackpot odds per line: 1 in 133,784,560
 
-### Picks for the 2026-11-10 draw
+### Picks for the 2026-11-13 draw
 
 | Set | Numbers | Basis |
 |---|---|---|
-| A - pattern | **06 23 30 36 41 43 50** | top ensemble score (long-run + recent frequency, overdue) with a typical sum/odd-even shape |
-| B - anti-crowd | **38 40 42 45 49 51 52** | numbers human players under-pick; no overlap with A |
+| A - pattern | **06 07 30 41 43 50 52** | top ensemble score (long-run + recent frequency, overdue) with a typical sum/odd-even shape |
+| B - anti-crowd | **32 34 40 45 48 49 51** | numbers human players under-pick; no overlap with A |
 
 ### 1. Observe - is anything non-random?
 
 | Statistic | Observed | Fair-draw 95% range | p |
 |---|---|---|---|
-| Frequency chi-square (are some numbers favoured?) | 28.61 | 29.16 - 63.18 | 0.04 (!) |
-| Most extreme hot/cold number, |z| | 2.21 | 1.88 - 3.51 | 0.43 |
-| Numbers repeated from previous draw (avg) | 1.02 | 0.88 - 1.07 | 0.35 |
-| Most frequent pair, times drawn together | 15.00 | 12.00 - 17.00 | 0.66 |
-| Average sum of main numbers | 180.31 | 175.88 - 183.79 | 0.81 |
-| Spread (SD) of sums | 35.00 | 33.41 - 38.74 | 0.43 |
-| Average count of odd numbers | 3.39 | 3.36 - 3.64 | 0.11 |
-| Share of draws with a consecutive pair | 0.59 | 0.56 - 0.67 | 0.53 |
+| Frequency chi-square (are some numbers favoured?) | 28.71 | 29.30 - 63.05 | 0.04 (!) |
+| Most extreme hot/cold number, |z| | 2.22 | 1.85 - 3.53 | 0.63 |
+| Numbers repeated from previous draw (avg) | 1.02 | 0.88 - 1.07 | 0.39 |
+| Most frequent pair, times drawn together | 15.00 | 12.00 - 17.00 | 0.68 |
+| Average sum of main numbers | 180.45 | 175.82 - 183.80 | 0.74 |
+| Spread (SD) of sums | 35.02 | 33.45 - 38.72 | 0.44 |
+| Average count of odd numbers | 3.39 | 3.36 - 3.64 | 0.12 |
+| Share of draws with a consecutive pair | 0.59 | 0.56 - 0.67 | 0.45 |
 
 1 of 8 statistics fall outside the fair-draw range at p<0.05 (about 0.4 expected by chance alone).
 
 Hot numbers (drawn more than expected):
 
 ```
- 6   54x  z=+1.72  ########################
-36   53x  z=+1.55  ########################
- 7   51x  z=+1.23  #######################
-28   51x  z=+1.23  #######################
-43   51x  z=+1.23  #######################
-22   50x  z=+1.06  ######################
-30   49x  z=+0.90  ######################
-34   49x  z=+0.90  ######################
+ 6   54x  z=+1.69  ########################
+36   53x  z=+1.53  ########################
+ 7   51x  z=+1.20  #######################
+28   51x  z=+1.20  #######################
+43   51x  z=+1.20  #######################
+22   50x  z=+1.04  ######################
+50   50x  z=+1.04  ######################
+30   49x  z=+0.88  ######################
 ```
 
 Cold numbers (drawn less than expected):
 
 ```
-17   30x  z=-2.21  #############
-42   35x  z=-1.39  ################
-27   35x  z=-1.39  ################
-26   37x  z=-1.06  ################
-15   38x  z=-0.90  #################
-13   38x  z=-0.90  #################
-49   39x  z=-0.73  #################
-47   39x  z=-0.73  #################
+17   30x  z=-2.22  #############
+42   35x  z=-1.41  ################
+27   35x  z=-1.41  ################
+26   37x  z=-1.08  ################
+15   38x  z=-0.92  #################
+13   38x  z=-0.92  #################
+49   39x  z=-0.76  #################
+19   39x  z=-0.76  #################
 ```
 
-Most overdue (draws since last seen): 27 (29), 3 (28), 9 (25), 18 (17), 45 (16), 40 (15), 44 (15), 14 (14)
+Most overdue (draws since last seen): 27 (30), 9 (26), 18 (18), 45 (17), 40 (16), 14 (15), 17 (14), 42 (14)
 
 Most frequent pairs: 22-46 (15x), 6-43 (14x), 6-30 (12x), 45-49 (11x), 28-36 (11x)
 
 ### 2. Learn - does any strategy beat random?
 
-Walk-forward over the last 213 draws; each pick uses only earlier draws.
+Walk-forward over the last 214 draws; each pick uses only earlier draws.
 
 | Strategy | Avg matches/ticket | Random expectation | z | Best single ticket |
 |---|---|---|---|---|
-| hot | 0.981 | 0.969 | +0.20 | 4 of 7 |
-| cold | 1.075 | 0.969 | +1.80 | 4 of 7 |
-| overdue | 0.981 | 0.969 | +0.20 | 3 of 7 |
-| ensemble | 0.944 | 0.969 | -0.44 | 4 of 7 |
+| hot | 0.981 | 0.969 | +0.21 | 4 of 7 |
+| cold | 1.070 | 0.969 | +1.72 | 4 of 7 |
+| overdue | 0.986 | 0.969 | +0.29 | 3 of 7 |
+| ensemble | 0.944 | 0.969 | -0.43 | 4 of 7 |
 
 No strategy differs from random by more than noise (|z| < 2.5 for all).
 
@@ -84,8 +84,8 @@ No strategy differs from random by more than noise (|z| < 2.5 for all).
 
 | Set | Numbers | Basis |
 |---|---|---|
-| A - pattern | **09 17 28 37 41 42** | top ensemble score (long-run + recent frequency, overdue) with a typical sum/odd-even shape |
-| B - anti-crowd | **30 34 40 44 48 49** | numbers human players under-pick; no overlap with A |
+| A - pattern | **09 17 37 41 42 46** | top ensemble score (long-run + recent frequency, overdue) with a typical sum/odd-even shape |
+| B - anti-crowd | **30 38 40 44 45 48** | numbers human players under-pick; no overlap with A |
 
 ### 1. Observe - is anything non-random?
 

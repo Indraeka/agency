@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lottery Analyst</title>
+<style>
+  :root {
+    --bg: #f4f1ea; --surface: #fffdf8; --ink: #1d1b16; --muted: #6b665a; --line: #ddd6c6;
+    --accent: #0f5c4d; --accent-ink: #ffffff; --a: #0f5c4d; --b: #9a4a12;
+    --ball: #ece6d8; --hit: #f2c230; --hit-ink: #2a2000; --warn-bg: #fbf0d2; --warn-line: #e3c96f;
+    --bad: #a3271b; --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14150f; --surface: #1d1f17; --ink: #ece8dc; --muted: #a09b8c; --line: #34372b;
+      --accent: #58c4a8; --accent-ink: #06231c; --a: #58c4a8; --b: #e89a5c;
+      --ball: #2b2e22; --hit: #f2c230; --hit-ink: #2a2000; --warn-bg: #2b2613; --warn-line: #5d5122;
+      --bad: #ff8d80;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 64px; }
+  header { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; }
+  h1 { font: 700 30px/1.1 ui-serif, Georgia, serif; margin: 0; letter-spacing: -0.01em; }
+  h2 { font: 700 21px/1.2 ui-serif, Georgia, serif; margin: 0; }
+  h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); margin: 22px 0 8px; }
+  .sub { color: var(--muted); margin: 6px 0 0; font-size: 14px; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  button { font: inherit; font-weight: 600; padding: 11px 18px; border-radius: 999px; cursor: pointer;
+           border: 1.5px solid var(--accent); background: transparent; color: var(--accent); }
+  button.primary { background: var(--accent); color: var(--accent-ink); }
+  button:disabled { opacity: .55; cursor: progress; }
+  button:focus-visible, summary:focus-visible { outline: 3px solid var(--hit); outline-offset: 2px; }
+  .note { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: var(--radius);
+          padding: 11px 15px; margin: 20px 0 0; font-size: 14.5px; }
+  #status { min-height: 24px; margin: 14px 2px 0; font-size: 14.5px; color: var(--muted); }
+  #status.error { color: var(--bad); font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px; margin-top: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .next { font-size: 14px; color: var(--muted); }
+  .next b { color: var(--ink); }
+  .set { margin-top: 14px; }
+  .set-label { font-size: 13px; font-weight: 700; display: flex; gap: 8px; align-items: baseline; }
+  .set-label span { font-weight: 400; color: var(--muted); }
+  .set.a .set-label { color: var(--a); } .set.b .set-label { color: var(--b); }
+  .balls { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 7px; }
+  .ball { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+          font-weight: 700; font-variant-numeric: tabular-nums; background: var(--ball); }
+  .set.a .ball { background: var(--a); color: var(--accent-ink); }
+  .set.b .ball { background: var(--b); color: #fff; }
+  .small .ball { width: 30px; height: 30px; font-size: 13px; }
+  .ball.bonus { background: transparent; border: 1.5px dashed var(--muted); color: var(--muted); }
+  .ball.hit { background: var(--hit); color: var(--hit-ink); }
+  .ball.miss { background: var(--ball); color: var(--muted); }
+  td .balls { flex-wrap: nowrap; }
+  @media (max-width: 480px) {
+    .card { padding: 16px; } .balls { gap: 4px; }
+    .ball { width: 38px; height: 38px; }
+    .small .ball { width: 24px; height: 24px; font-size: 11.5px; } .small.balls { gap: 3px; }
+    .draw { gap: 8px; } .draw time { width: 72px; font-size: 13px; }
+  }
+  .empty { color: var(--muted); font-size: 14.5px; padding: 14px 0 4px; }
+  .draw { display: flex; align-items: center; gap: 12px; padding: 6px 0; border-top: 1px solid var(--line); }
+  .draw:first-of-type { border-top: 0; }
+  .draw time { width: 92px; flex: none; font-size: 13.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  section { margin-top: 34px; }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 20px; }
+  summary { cursor: pointer; font-weight: 700; }
+  .flag { color: var(--bad); font-weight: 700; }
+  .meta { font-size: 13px; color: var(--muted); margin-top: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Lottery Analyst</h1>
+      <p class="sub" id="fresh">Loading results…</p>
+    </div>
+    <div class="actions">
+      <button id="refresh">Refresh results</button>
+      <button id="generate" class="primary">Generate numbers</button>
+    </div>
+  </header>
+
+  <p class="note"><b>Same odds as a quick pick.</b> Three years of draws show no pattern that beats chance,
+    so these sets are a tie-break, not a prediction. Set B only aims to avoid sharing a prize.</p>
+  <p id="status" role="status" aria-live="polite"></p>
+
+  <div class="grid" id="games"></div>
+
+  <section>
+    <h2>Track record</h2>
+    <p class="sub">Every generated pair is saved and scored once its draw is published.</p>
+    <div class="scroll" id="history"></div>
+  </section>
+
+  <section>
+    <details id="evidence">
+      <summary>Evidence: is anything non-random?</summary>
+      <div id="evidence-body"><p class="empty">Open to run the tests (takes a few seconds).</p></div>
+    </details>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const fmtDate = (iso, opts) => new Date(iso + "T12:00:00").toLocaleDateString(undefined, opts || { weekday: "short", month: "short", day: "numeric" });
+let current = { state: null, picks: null, variants: {} };
+
+function balls(nums, opts = {}) {
+  const wrap = el("div", "balls" + (opts.small ? " small" : ""));
+  for (const n of nums) {
+    let cls = "ball";
+    if (opts.drawn) cls += opts.drawn.includes(n) ? " hit" : " miss";
+    wrap.append(el("span", cls, String(n).padStart(2, "0")));
+  }
+  if (opts.bonus != null) { const b = el("span", "ball bonus", String(opts.bonus).padStart(2, "0")); b.title = "Bonus number"; wrap.append(b); }
+  return wrap;
+}
+
+function setBlock(kind, title, why, nums) {
+  const box = el("div", "set " + kind);
+  const label = el("div", "set-label", title);
+  label.append(el("span", null, why));
+  box.append(label, balls(nums));
+  return box;
+}
+
+function render() {
+  const { state, picks } = current;
+  const games = $("games"); games.replaceChildren();
+  const lasts = [];
+  for (const [id, g] of Object.entries(state.games)) {
+    lasts.push(`${g.label} to ${fmtDate(g.last, { month: "short", day: "numeric" })}`);
+    const card = el("article", "card");
+    const head = el("div", "card-head");
+    head.append(el("h2", null, g.label));
+    const next = el("div", "next", "Next draw ");
+    next.append(el("b", null, fmtDate(g.next_draw)));
+    head.append(next);
+    card.append(head);
+
+    const p = picks && picks[id];
+    if (p) {
+      card.append(setBlock("a", "Set A · pattern", "frequency and overdue score", p.set_a));
+      card.append(setBlock("b", "Set B · anti-crowd", "numbers others under-pick", p.set_b));
+      card.append(el("p", "meta", `Based on ${p.based_on_draws} draws up to ${fmtDate(p.last_draw)}.`));
+    } else {
+      card.append(el("p", "empty", "No numbers yet for this draw. Press Generate numbers."));
+    }
+
+    card.append(el("h3", null, "Latest results"));
+    for (const d of g.recent) {
+      const row = el("div", "draw");
+      const t = el("time", null, fmtDate(d.date)); t.dateTime = d.date;
+      row.append(t, balls(d.main, { small: true, bonus: d.bonus }));
+      card.append(row);
+    }
+    card.append(el("p", "meta", `${g.draws} draws on file since ${fmtDate(g.first, { year: "numeric", month: "short" })} · ${g.k} numbers from 1–${g.pool}`));
+    games.append(card);
+  }
+  $("fresh").textContent = "Results on file: " + lasts.join(" · ");
+  renderHistory(state.history);
+}
+
+function renderHistory(history) {
+  const box = $("history"); box.replaceChildren();
+  if (!history.length) { box.append(el("p", "empty", "Nothing generated yet.")); return; }
+  const table = el("table");
+  const hr = el("tr");
+  for (const h of ["Draw", "Game", "Set", "Your numbers", "Result"]) hr.append(el("th", null, h));
+  table.append(hr);
+  for (const h of history) {
+    for (const [key, name] of [["set_a", "A"], ["set_b", "B"]]) {
+      const tr = el("tr");
+      tr.append(el("td", "num", fmtDate(h.draw_date)), el("td", null, h.label), el("td", null, name));
+      const nums = el("td"); nums.append(balls(h[key], { small: true, drawn: h.drawn ? h.drawn.main : null })); tr.append(nums);
+      let result = "Waiting for draw";
+      if (h.drawn) result = `${h[key + "_matches"]} of ${h[key].length} matched` + (h[key + "_bonus"] ? " + bonus" : "");
+      tr.append(el("td", "num", result));
+      table.append(tr);
+    }
+  }
+  box.append(table);
+}
+
+function setStatus(text, isError) { const s = $("status"); s.textContent = text; s.className = isError ? "error" : ""; }
+
+async function call(path, body) {
+  const res = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : undefined);
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error(data.error || res.statusText);
+  return data;
+}
+
+async function busy(button, label, fn) {
+  const buttons = [$("refresh"), $("generate")], old = button.textContent;
+  buttons.forEach((b) => (b.disabled = true)); button.textContent = label;
+  try { await fn(); } catch (e) { setStatus("Failed: " + e.message, true); }
+  buttons.forEach((b) => (b.disabled = false)); button.textContent = old;
+}
+
+/* Show saved picks for the upcoming draw, if this dataset already has some. */
+function adoptSavedPicks() {
+  const picks = {}; current.variants = {};
+  for (const [id, g] of Object.entries(current.state.games)) {
+    const h = current.state.history.find((x) => x.game === id && x.draw_date === g.next_draw && !x.drawn);
+    current.variants[id] = h ? h.variant : -1;
+    if (h) picks[id] = { set_a: h.set_a, set_b: h.set_b, based_on_draws: g.draws, last_draw: g.last };
+  }
+  current.picks = Object.keys(picks).length ? picks : null;
+  const all = Object.keys(picks).length === Object.keys(current.state.games).length;
+  $("generate").textContent = all ? "Generate another pair" : "Generate numbers";
+}
+
+$("refresh").onclick = () => busy($("refresh"), "Checking…", async () => {
+  setStatus("Downloading the latest published results…");
+  const data = await call("/api/refresh", {});
+  current.state = data.state;
+  const parts = [], problems = [];
+  for (const [id, r] of Object.entries(data.refresh)) {
+    const label = data.state.games[id].label;
+    if (r.problems.length) problems.push(`${label}: ${r.problems[0]}`);
+    else if (r.added.length) parts.push(`${label}: added ${r.added.map((d) => fmtDate(d.date, { month: "short", day: "numeric" })).join(", ")}`);
+  }
+  adoptSavedPicks(); render();
+  if (problems.length) setStatus("Not saved, the data looked wrong. " + problems.join(" · "), true);
+  else if (parts.length) setStatus(parts.join(" · ") + ". Generate numbers for the next draw.");
+  else setStatus("Already up to date. No new draws have been published.");
+  if ($("evidence").open) loadEvidence();
+});
+
+$("generate").onclick = () => busy($("generate"), "Generating…", async () => {
+  const next = {};
+  for (const id of Object.keys(current.state.games)) next[id] = (current.variants[id] ?? -1) + 1;
+  const data = await call("/api/generate", { variants: next });
+  current.state = data.state;
+  adoptSavedPicks(); current.picks = data.picks; render();
+  const fresh = Object.values(next).every((v) => v === 0);
+  setStatus(fresh ? "Generated a pair for each game and saved it to the track record."
+                  : "Generated a new pair. It replaces the saved pair for each upcoming draw.");
+});
+
+async function loadEvidence() {
+  const body = $("evidence-body");
+  body.replaceChildren(el("p", "empty", "Running fair-draw simulations…"));
+  try {
+    const data = await call("/api/evidence");
+    body.replaceChildren();
+    for (const [id, ev] of Object.entries(data)) {
+      body.append(el("h3", null, current.state.games[id].label + " · jackpot odds 1 in " + ev.jackpot_odds.toLocaleString()));
+      const t = el("table"); let tr = el("tr");
+      for (const h of ["Statistic", "Observed", "Fair-draw 95% range", "p"]) tr.append(el("th", null, h));
+      t.append(tr);
+      for (const x of ev.tests) {
+        tr = el("tr");
+        tr.append(el("td", null, x.label), el("td", "num", x.observed.toFixed(2)),
+                  el("td", "num", `${x.null_lo.toFixed(2)} – ${x.null_hi.toFixed(2)}`),
+                  el("td", "num" + (x.p < 0.05 ? " flag" : ""), x.p.toFixed(2) + (x.p < 0.05 ? " outside range" : "")));
+        t.append(tr);
+      }
+      const wrap = el("div", "scroll"); wrap.append(t); body.append(wrap);
+      const t2 = el("table"); tr = el("tr");
+      for (const h of ["Strategy back-test", "Avg matches per ticket", "Random expectation", "z"]) tr.append(el("th", null, h));
+      t2.append(tr);
+      for (const b of ev.backtest) {
+        tr = el("tr");
+        tr.append(el("td", null, b.strategy), el("td", "num", b.mean_matches.toFixed(3)), el("td", "num", b.expected_random.toFixed(3)),
+                  el("td", "num" + (Math.abs(b.z) > 2.5 ? " flag" : ""), (b.z >= 0 ? "+" : "") + b.z.toFixed(2)));
+        t2.append(tr);
+      }
+      const wrap2 = el("div", "scroll"); wrap2.append(t2); body.append(wrap2);
+      body.append(el("p", "meta", "Hot: " + ev.hot.map((h) => h[0]).join(", ") + " · Cold: " + ev.cold.map((h) => h[0]).join(", ") +
+        " · Most overdue: " + ev.overdue.map((h) => `${h[0]} (${h[1]})`).join(", ")));
+    }
+    body.append(el("p", "meta", "About 1 statistic in 20 lands outside its range by chance alone. A strategy needs |z| above 2.5 to be worth re-testing."));
+  } catch (e) { body.replaceChildren(el("p", "empty", "Could not run the tests: " + e.message)); }
+}
+$("evidence").addEventListener("toggle", () => { if ($("evidence").open) loadEvidence(); });
+
+call("/api/state").then((s) => { current.state = s; adoptSavedPicks(); render(); })
+  .catch((e) => setStatus("Could not load: " + e.message, true));
+</script>
+</body>
+</html>

@@ -23,7 +23,6 @@ import argparse
 import csv
 import datetime as dt
 import hashlib
-import itertools
 import json
 from collections import Counter
 from pathlib import Path
@@ -219,22 +218,32 @@ def backtest(main, pools, warmup=100) -> list[dict]:
 
 
 # --------------------------------------------------------------------------- pick
-def shape_ok(ticket, main_hist, pool) -> bool:
-    """Reject shapes that are rare in real draws (keeps the middle ~80%)."""
-    t = np.array(ticket)
-    k = len(t)
+def distinct_per_row(a: np.ndarray) -> np.ndarray:
+    a = np.sort(a, axis=1)
+    return 1 + (np.diff(a, axis=1) != 0).sum(1)
+
+
+def sample_tickets(numbers: np.ndarray, weights: np.ndarray, k: int, n: int, rng) -> np.ndarray:
+    """n weighted tickets without replacement (Gumbel top-k), each row sorted."""
+    keys = np.log(weights)[None, :] + rng.gumbel(size=(n, len(numbers)))
+    idx = np.argpartition(-keys, k, axis=1)[:, :k]
+    return np.sort(numbers[idx], axis=1)
+
+
+def shape_ok(t: np.ndarray, main_hist, pool) -> np.ndarray:
+    """Mask of tickets whose shape is common in real draws (middle ~80%)."""
+    k = t.shape[1]
     scale = (pool + 1) / 2 * k  # rescale history sums to the current pool
     sums = main_hist.sum(1)
-    lo, hi = np.quantile(sums, [0.10, 0.90])
-    lo, hi = lo / sums.mean() * scale, hi / sums.mean() * scale
-    odd = int((t % 2).sum())
-    runs = np.diff(t) == 1
-    longest_run = max((len(list(g)) for v, g in itertools.groupby(runs) if v), default=0)
+    lo, hi = np.quantile(sums, [0.10, 0.90]) / sums.mean() * scale
+    odd = (t % 2).sum(1)
+    run = np.diff(t, axis=1) == 1
+    three_in_a_row = (run[:, 1:] & run[:, :-1]).any(1)
     return (
-        lo <= t.sum() <= hi
-        and 2 <= odd <= k - 2
-        and longest_run <= 1
-        and len({(n - 1) // 10 for n in ticket}) >= 4
+        (t.sum(1) >= lo) & (t.sum(1) <= hi)
+        & (odd >= 2) & (odd <= k - 2)
+        & ~three_in_a_row
+        & (distinct_per_row((t - 1) // 10) >= 4)
     )
 
 
@@ -259,47 +268,56 @@ def popularity(n: int) -> float:
     return p
 
 
-def is_patterned(ticket) -> bool:
-    d = np.diff(ticket)
-    return len(set(d.tolist())) <= 2 or len({n % 10 for n in ticket}) <= 3
+N_CANDIDATES = 60000
 
 
 def pick_pattern(score: np.ndarray, main_hist, pool, k, rng):
     """Best-scoring ticket among shape-valid candidates sampled toward high scores."""
     s = score[:pool]
     w = np.exp((s - s.max()) * 1.2)
-    w /= w.sum()
-    best, best_val = None, -np.inf
-    for _ in range(40000):
-        t = tuple(sorted((rng.choice(pool, size=k, replace=False, p=w) + 1).tolist()))
-        if not shape_ok(t, main_hist, pool):
-            continue
-        val = float(s[np.array(t) - 1].sum())
-        if val > best_val:
-            best, best_val = t, val
-    return list(best)
+    t = sample_tickets(np.arange(1, pool + 1), w, k, N_CANDIDATES, rng)
+    t = t[shape_ok(t, main_hist, pool)]
+    # small jitter: near-ties are broken by the seed, so "generate again" varies
+    val = s[t - 1].sum(1) + rng.random(len(t)) * 0.25
+    return t[np.argmax(val)].tolist()
 
 
-def pick_anticrowd(exclude, main_hist, pool, k, rng):
-    """Least 'popular' shape-relaxed ticket, disjoint from `exclude`."""
+def pick_anticrowd(exclude, pool, k, rng):
+    """Least 'popular' ticket without an obvious visual pattern, disjoint from `exclude`."""
     pop = np.array([popularity(n) for n in range(1, pool + 1)])
     avail = np.array([n for n in range(1, pool + 1) if n not in exclude])
-    w = 1 / pop[avail - 1] ** 3
-    w /= w.sum()
-    best, best_val = None, np.inf
-    for _ in range(40000):
-        t = tuple(sorted(rng.choice(avail, size=k, replace=False, p=w).tolist()))
-        arr = np.array(t)
-        if is_patterned(arr) or (np.diff(arr) == 1).sum() > 1:
-            continue
-        decades = Counter((n - 1) // 10 for n in t)
-        if (arr > 31).sum() < k - 2 or len(decades) < 3 or max(decades.values()) > 3:
-            continue
-        # tiny random jitter so the result is not always the same 'obvious' corner
-        val = float(pop[arr - 1].sum()) + rng.random() * 0.3
-        if val < best_val:
-            best, best_val = t, val
-    return list(best)
+    t = sample_tickets(avail, 1 / pop[avail - 1] ** 3, k, N_CANDIDATES, rng)
+    gaps = np.diff(t, axis=1)
+    decade = (t - 1) // 10
+    ok = (
+        (distinct_per_row(gaps) > 2)            # not an arithmetic-looking sequence
+        & (distinct_per_row(t % 10) > 3)        # not all the same last digits
+        & ((gaps == 1).sum(1) <= 1)
+        & ((t > 31).sum(1) >= k - 2)
+        & (distinct_per_row(decade) >= 3)
+        & (np.stack([(decade == d).sum(1) for d in range(6)]).max(0) <= 3)
+    )
+    t = t[ok]
+    val = pop[t - 1].sum(1) + rng.random(len(t)) * 0.3
+    return t[np.argmin(val)].tolist()
+
+
+def make_picks(game: str, seed_extra: str = "", today: dt.date | None = None) -> dict:
+    """The two tickets for the next draw. Fast: needs no simulation."""
+    cfg = GAMES[game]
+    dates, main, _, pools = load(game)
+    k, pool_now = cfg["k"], int(pools[-1])
+    seed = int(hashlib.sha256(f"pick|{game}|{dates[-1]}|{seed_extra}".encode()).hexdigest()[:8], 16)
+    rng = np.random.default_rng(seed)
+    set_a = pick_pattern(scores(main, pools, pool_now)["ensemble"], main, pool_now, k, rng)
+    set_b = pick_anticrowd(set(set_a), pool_now, k, rng)
+    return {
+        "set_a": set_a,
+        "set_b": set_b,
+        "next_draw": next_draw(dates[-1], cfg["weekdays"], today or dt.date.today()),
+        "based_on_draws": len(dates),
+        "last_draw": dates[-1],
+    }
 
 
 def next_draw(last: str, weekdays, today: dt.date) -> str:
@@ -332,9 +350,8 @@ def run_game(game: str, sims: int, seed_extra: str, today: dt.date) -> tuple[dic
     counts, z = real["_counts"], real["_z"]
     gap = last_seen_gap(main, pools.max())
 
-    set_a = pick_pattern(sc["ensemble"], main, pool_now, k, rng)
-    set_b = pick_anticrowd(set(set_a), main, pool_now, k, rng)
-    draw_date = next_draw(dates[-1], cfg["weekdays"], today)
+    picks = make_picks(game, seed_extra, today)
+    set_a, set_b, draw_date = picks["set_a"], picks["set_b"], picks["next_draw"]
 
     order = np.argsort(-z[:pool_now], kind="stable")
     hot = [(int(i + 1), int(counts[i]), float(z[i])) for i in order[:8]]
