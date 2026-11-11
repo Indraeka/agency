@@ -3,9 +3,18 @@
 Downloads three years of draw results, tests them for patterns, back-tests
 number-picking strategies, and prints two sets of numbers per game for the next draw.
 
+**Desktop:** double-click `start.bat` (Windows) or `start.command` (Mac). It installs
+`numpy` if needed, starts the app and opens it in your browser. Keep the window open
+while you use the page.
+
+Or from a terminal:
+
 ```
-python3 app.py        # web interface at http://127.0.0.1:8649
+python3 app.py        # opens http://127.0.0.1:8649
 ```
+
+The page only works through this program. Opening `ui.html` directly, or from a
+website, shows a "Start the app first" message.
 
 The page has two buttons:
 

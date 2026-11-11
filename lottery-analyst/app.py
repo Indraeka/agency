@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Local web interface for the lottery analyst.
 
-    python3 app.py            then open http://127.0.0.1:8649
+    python3 app.py            starts the server and opens the page in your browser
+                              (or double-click start.bat / start.command)
 
 Buttons on the page call this server, which runs the same code as the CLI:
   Refresh results  -> fetch.refresh()        adds draws published since last time
@@ -17,6 +18,7 @@ import datetime as dt
 import json
 import threading
 import traceback
+import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -158,10 +160,23 @@ def main() -> None:
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8649)
     ap.add_argument("--sims", type=int, default=1000, help="fair-draw simulations for the evidence panel")
+    ap.add_argument("--no-open", action="store_true", help="do not open the browser automatically")
     args = ap.parse_args()
     Handler.sims = args.sims
-    server = ThreadingHTTPServer((args.host, args.port), Handler)
-    print(f"Lottery analyst running at http://{args.host}:{args.port}  (Ctrl+C to stop)")
+    server = None
+    for port in range(args.port, args.port + 20):  # skip ports that are already taken
+        try:
+            server = ThreadingHTTPServer((args.host, port), Handler)
+            break
+        except OSError:
+            continue
+    if server is None:
+        raise SystemExit(f"No free port between {args.port} and {args.port + 19}.")
+    url = f"http://{args.host}:{server.server_port}"
+    print(f"Lottery analyst running at {url}")
+    print("Keep this window open while you use the page. Close it (or press Ctrl+C) to stop.")
+    if not args.no_open:
+        threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:
         server.serve_forever()
     except KeyboardInterrupt:

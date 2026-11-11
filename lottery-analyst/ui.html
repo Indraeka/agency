@@ -290,7 +290,17 @@ async function loadEvidence() {
 $("evidence").addEventListener("toggle", () => { if ($("evidence").open) loadEvidence(); });
 
 call("/api/state").then((s) => { current.state = s; adoptSavedPicks(); render(); })
-  .catch((e) => setStatus("Could not load: " + e.message, true));
+  .catch(() => {
+    $("refresh").disabled = $("generate").disabled = true;
+    $("fresh").textContent = "Not connected";
+    const box = el("div", "card");
+    box.append(el("h2", null, "Start the app first"),
+      el("p", null, "This page only works while its small local program is running on your computer."),
+      el("p", null, "Windows: double-click start.bat in the lottery-analyst folder."),
+      el("p", null, "Mac: double-click start.command in the lottery-analyst folder."),
+      el("p", "meta", "Either one opens this page for you at http://127.0.0.1:8649. Opening ui.html directly, or from a website, cannot work."));
+    $("games").replaceChildren(box);
+  });
 </script>
 </body>
 </html>
