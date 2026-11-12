@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Download Lotto Max and Lotto 6/49 draw history into data/*.csv.
+"""Download Lotto Max, Lotto 6/49 and Daily Grand draw history into data/*.csv.
 
 Sources (both public results archives; OLG itself publishes no bulk export):
-  * lotteryextreme.com  - month-by-month archive, both games (primary)
+  * lotteryextreme.com  - month-by-month archive, all games (primary)
   * lottomaxnumbers.com - year-by-year archive, Lotto Max only (cross-check)
 
 Every Lotto Max draw is compared across the two sources; any disagreement is
@@ -30,7 +30,13 @@ GAMES = {
     # name: (lotteryextreme slug, main balls per draw, draw weekdays Mon=0)
     "lottomax": ("lottomax", 7, {1, 4}),
     "lotto649": ("lotto649", 6, {2, 5}),
+    "dailygrand": ("dailygrand", 5, {0, 3}),
 }
+# Archive page name where it is not "<slug>-results".
+ARCHIVE_PAGE = {"dailygrand": "dailygrand-winningnumbers"}
+# Games whose extra number comes from its own pool, so it may repeat a main number
+# (Daily Grand's Grand Number, 1-7). Stored in the "bonus" column like the others.
+SEPARATE_EXTRA = {"dailygrand"}
 
 
 def http(url: str, data: dict | None = None, tries: int = 4) -> str:
@@ -62,7 +68,7 @@ ROW = re.compile(
 
 def fetch_lotteryextreme(game: str, start: dt.date, end: dt.date) -> dict:
     slug, n_main, _ = GAMES[game]
-    url = f"https://www.lotteryextreme.com/canada/{slug}-results"
+    url = f"https://www.lotteryextreme.com/canada/{ARCHIVE_PAGE.get(game, slug + '-results')}"
     draws = {}
     for ym in months_back(start, end):
         html = http(url, {"mode": "month", "year_month": ym})
@@ -107,7 +113,7 @@ def validate(game: str, draws: dict, start: dt.date, end: dt.date) -> list[str]:
     _, _, weekdays = GAMES[game]
     problems = []
     for date, (main, bonus) in draws.items():
-        if len(set(main)) != len(main) or bonus in main:
+        if len(set(main)) != len(main) or (bonus in main and game not in SEPARATE_EXTRA):
             problems.append(f"{date}: duplicate ball")
         if dt.date.fromisoformat(date).weekday() not in weekdays:
             problems.append(f"{date}: not a scheduled draw day")

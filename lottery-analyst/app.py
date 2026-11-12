@@ -45,6 +45,7 @@ def state() -> dict:
             "label": cfg["label"],
             "k": cfg["k"],
             "pool": int(pools[-1]),
+            "extra": cfg.get("extra"),
             "draws": len(dates),
             "first": dates[0],
             "last": dates[-1],
@@ -64,26 +65,31 @@ def state() -> dict:
             for key in ("set_a", "set_b"):
                 entry[f"{key}_matches"] = len(drawn.intersection(h[key]))
                 entry[f"{key}_bonus"] = bonus in h[key]
+            if "extra_a" in h:  # the extra number is its own pick, not one of the main numbers
+                entry["set_a_bonus"], entry["set_b_bonus"] = h["extra_a"] == bonus, h["extra_b"] == bonus
         history.append(entry)
     history.sort(key=lambda e: (e["draw_date"], e["game"]), reverse=True)
     return {"today": today.isoformat(), "games": games, "history": history}
 
 
 def generate(variants: dict) -> dict:
-    """Make picks for both games and remember them (one entry per game and draw).
+    """Make picks for the requested games and remember them (one entry per game and draw).
 
     variants[game] = 0 gives the default pair; higher numbers give alternatives.
     """
     history = load_history()
     picks = {}
     for gid in analyze.GAMES:
-        variant = max(0, min(int(variants.get(gid, 0)), 10**6))
+        if gid not in variants:  # only the games asked for; saved pairs of the others stay
+            continue
+        variant = max(0, min(int(variants[gid]), 10**6))
         p = analyze.make_picks(gid, "" if variant == 0 else str(variant))
         picks[gid] = p
         history = [h for h in history if not (h["game"] == gid and h["draw_date"] == p["next_draw"])]
         history.append({
             "game": gid, "draw_date": p["next_draw"], "variant": variant,
             "set_a": p["set_a"], "set_b": p["set_b"],
+            **{k: p[k] for k in ("extra_a", "extra_b") if k in p},
             "generated_at": dt.datetime.now().isoformat(timespec="seconds"),
         })
     HISTORY.write_text(json.dumps(history, indent=1) + "\n")

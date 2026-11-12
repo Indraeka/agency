@@ -256,7 +256,7 @@
   },
   "lotto649": {
     "game": "Lotto 6/49",
-    "next_draw": "2026-11-11",
+    "next_draw": "2026-11-14",
     "draws_analysed": 313,
     "data_range": [
       "2023-11-11",
@@ -504,6 +504,269 @@
       [
         14,
         17
+      ]
+    ]
+  },
+  "dailygrand": {
+    "game": "Daily Grand",
+    "next_draw": "2026-11-12",
+    "draws_analysed": 316,
+    "data_range": [
+      "2023-11-02",
+      "2026-11-09"
+    ],
+    "pool": 49,
+    "jackpot_odds": 13348188,
+    "set_a_pattern": [
+      6,
+      25,
+      36,
+      37,
+      42
+    ],
+    "set_b_anticrowd": [
+      20,
+      40,
+      41,
+      45,
+      47
+    ],
+    "extra_name": "Grand Number",
+    "extra_a": 6,
+    "extra_b": 3,
+    "tests": [
+      {
+        "key": "chi2",
+        "label": "Frequency chi-square (are some numbers favoured?)",
+        "observed": 49.77721518987305,
+        "null_mean": 43.88681044303764,
+        "null_lo": 28.254430379746623,
+        "null_hi": 62.618006329113456,
+        "p": 0.495
+      },
+      {
+        "key": "max_abs_z",
+        "label": "Most extreme hot/cold number, |z|",
+        "observed": 3.113782513600147,
+        "null_mean": 2.505985251658787,
+        "null_lo": 1.812896518271443,
+        "null_hi": 3.671305083026734,
+        "p": 0.23
+      },
+      {
+        "key": "repeat_prev",
+        "label": "Numbers repeated from previous draw (avg)",
+        "observed": 0.4666666666666667,
+        "null_mean": 0.5100611111111111,
+        "null_lo": 0.4380952380952381,
+        "null_hi": 0.5841269841269842,
+        "p": 0.238
+      },
+      {
+        "key": "max_pair",
+        "label": "Most frequent pair, times drawn together",
+        "observed": 9.0,
+        "null_mean": 9.41725,
+        "null_lo": 8.0,
+        "null_hi": 11.0,
+        "p": 1.0
+      },
+      {
+        "key": "mean_sum",
+        "label": "Average sum of main numbers",
+        "observed": 127.2879746835443,
+        "null_mean": 125.04265031645569,
+        "null_lo": 121.70237341772152,
+        "null_hi": 128.4053006329114,
+        "p": 0.1925
+      },
+      {
+        "key": "sd_sum",
+        "label": "Spread (SD) of sums",
+        "observed": 29.826332469083777,
+        "null_mean": 30.189883297586753,
+        "null_lo": 28.069905466417914,
+        "null_hi": 32.41293763081615,
+        "p": 0.7485
+      },
+      {
+        "key": "mean_odd",
+        "label": "Average count of odd numbers",
+        "observed": 2.6044303797468356,
+        "null_mean": 2.5510632911392404,
+        "null_lo": 2.4335443037974684,
+        "null_hi": 2.6677215189873418,
+        "p": 0.3925
+      },
+      {
+        "key": "consecutive_rate",
+        "label": "Share of draws with a consecutive pair",
+        "observed": 0.3227848101265823,
+        "null_mean": 0.35889477848101264,
+        "null_lo": 0.3069620253164557,
+        "null_hi": 0.41455696202531644,
+        "p": 0.1985
+      },
+      {
+        "key": "extra_chi2",
+        "label": "Grand Number frequency chi-square",
+        "observed": 8.61392405063291,
+        "null_mean": 5.902919303797467,
+        "null_lo": 1.2151898734177216,
+        "null_hi": 14.50743670886076,
+        "p": 0.383
+      }
+    ],
+    "backtest": [
+      {
+        "strategy": "hot",
+        "draws": 216,
+        "mean_matches": 0.5555555555555556,
+        "expected_random": 0.5102040816326533,
+        "z": 1.0285189544531552,
+        "best_single_ticket": 2
+      },
+      {
+        "strategy": "cold",
+        "draws": 216,
+        "mean_matches": 0.4861111111111111,
+        "expected_random": 0.5102040816326533,
+        "z": -0.5464006945532467,
+        "best_single_ticket": 2
+      },
+      {
+        "strategy": "overdue",
+        "draws": 216,
+        "mean_matches": 0.5509259259259259,
+        "expected_random": 0.5102040816326533,
+        "z": 0.9235243111860614,
+        "best_single_ticket": 2
+      },
+      {
+        "strategy": "ensemble",
+        "draws": 216,
+        "mean_matches": 0.5509259259259259,
+        "expected_random": 0.5102040816326533,
+        "z": 0.9235243111860614,
+        "best_single_ticket": 2
+      }
+    ],
+    "hot": [
+      [
+        42,
+        49,
+        3.113782513600147
+      ],
+      [
+        37,
+        46,
+        2.5562599441735596
+      ],
+      [
+        25,
+        40,
+        1.4412148053203848
+      ],
+      [
+        5,
+        39,
+        1.2553739488448556
+      ],
+      [
+        18,
+        38,
+        1.0695330923693265
+      ],
+      [
+        33,
+        38,
+        1.0695330923693265
+      ],
+      [
+        45,
+        38,
+        1.0695330923693265
+      ],
+      [
+        6,
+        37,
+        0.8836922358937974
+      ]
+    ],
+    "cold": [
+      [
+        40,
+        18,
+        -2.647284037141256
+      ],
+      [
+        15,
+        23,
+        -1.7180797547636102
+      ],
+      [
+        9,
+        23,
+        -1.7180797547636102
+      ],
+      [
+        4,
+        23,
+        -1.7180797547636102
+      ],
+      [
+        38,
+        24,
+        -1.532238898288081
+      ],
+      [
+        34,
+        25,
+        -1.346398041812552
+      ],
+      [
+        26,
+        25,
+        -1.346398041812552
+      ],
+      [
+        16,
+        25,
+        -1.346398041812552
+      ]
+    ],
+    "overdue": [
+      [
+        47,
+        29
+      ],
+      [
+        11,
+        28
+      ],
+      [
+        4,
+        26
+      ],
+      [
+        15,
+        24
+      ],
+      [
+        49,
+        23
+      ],
+      [
+        12,
+        22
+      ],
+      [
+        23,
+        20
+      ],
+      [
+        34,
+        20
       ]
     ]
   }

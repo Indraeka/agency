@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lotto Max / Lotto 6/49 analyst.
+"""Lotto Max / Lotto 6/49 / Daily Grand analyst.
 
 Three stages, run in order for each game:
 
@@ -46,6 +46,15 @@ GAMES = {
         "k": 6,
         "weekdays": {2, 5},  # Wed, Sat
         "pools": [("0000-00-00", 49)],
+    },
+    "dailygrand": {
+        "label": "Daily Grand",
+        "k": 5,
+        "weekdays": {0, 3},  # Mon, Thu
+        "pools": [("0000-00-00", 49)],
+        # A second number the player also chooses, drawn from its own pool.
+        # It is stored in the CSV "bonus" column.
+        "extra": {"name": "Grand Number", "pool": 7},
     },
 }
 
@@ -305,13 +314,22 @@ def pick_anticrowd(exclude, pool, k, rng):
 def make_picks(game: str, seed_extra: str = "", today: dt.date | None = None) -> dict:
     """The two tickets for the next draw. Fast: needs no simulation."""
     cfg = GAMES[game]
-    dates, main, _, pools = load(game)
+    dates, main, bonus, pools = load(game)
     k, pool_now = cfg["k"], int(pools[-1])
     seed = int(hashlib.sha256(f"pick|{game}|{dates[-1]}|{seed_extra}".encode()).hexdigest()[:8], 16)
     rng = np.random.default_rng(seed)
     set_a = pick_pattern(scores(main, pools, pool_now)["ensemble"], main, pool_now, k, rng)
     set_b = pick_anticrowd(set(set_a), pool_now, k, rng)
+    out = {}
+    if "extra" in cfg:
+        # Set A takes the most-drawn extra number (ties broken by the seed);
+        # Set B takes any other one, so the two tickets cover different outcomes.
+        n = cfg["extra"]["pool"]
+        freq = np.bincount(bonus, minlength=n + 1)[1:] + rng.random(n) * 0.5
+        out["extra_a"] = int(np.argmax(freq)) + 1
+        out["extra_b"] = int(rng.choice([x for x in range(1, n + 1) if x != out["extra_a"]]))
     return {
+        **out,
         "set_a": set_a,
         "set_b": set_b,
         "next_draw": next_draw(dates[-1], cfg["weekdays"], today or dt.date.today()),
@@ -344,6 +362,20 @@ def run_game(game: str, sims: int, seed_extra: str, today: dt.date) -> tuple[dic
     rng = np.random.default_rng(seed)
 
     obs = observe(main, pools, sims, rng)
+    extra = cfg.get("extra")
+    if extra:
+        # Same question for the separately drawn extra number: is any value favoured?
+        n, e = extra["pool"], len(bonus) / extra["pool"]
+        chi = float(((np.bincount(bonus, minlength=n + 1)[1:] - e) ** 2 / e).sum())
+        sim = rng.integers(0, n, size=(sims, len(bonus)))
+        null = np.array([((np.bincount(row, minlength=n) - e) ** 2 / e).sum() for row in sim])
+        lo, hi = (null <= chi).mean(), (null >= chi).mean()
+        obs["tests"].append({
+            "key": "extra_chi2", "label": f"{extra['name']} frequency chi-square",
+            "observed": chi, "null_mean": float(null.mean()),
+            "null_lo": float(np.quantile(null, 0.025)), "null_hi": float(np.quantile(null, 0.975)),
+            "p": float(min(1.0, 2 * min(lo, hi))),
+        })
     bt = backtest(main, pools)
     sc = scores(main, pools, pool_now)
     real = obs["real"]
@@ -364,6 +396,11 @@ def run_game(game: str, sims: int, seed_extra: str, today: dt.date) -> tuple[dic
     odds = 1
     for i in range(k):
         odds = odds * (pool_now - i) // (i + 1)
+    if extra:
+        odds *= extra["pool"]
+
+    def show(ticket, key):
+        return fmt_ticket(ticket) + (f" + {extra['name']} {picks[key]}" if extra else "")
 
     L = [f"## {cfg['label']}", ""]
     L.append(f"- Draws analysed: **{len(dates)}** ({dates[0]} to {dates[-1]}), {k} main numbers from 1-{pool_now}")
@@ -373,16 +410,16 @@ def run_game(game: str, sims: int, seed_extra: str, today: dt.date) -> tuple[dic
     L.append(f"- Jackpot odds per line: 1 in {odds:,}")
     L += ["", f"### Picks for the {draw_date} draw", "",
           "| Set | Numbers | Basis |", "|---|---|---|",
-          f"| A - pattern | **{fmt_ticket(set_a)}** | top ensemble score (long-run + recent frequency, overdue) with a typical sum/odd-even shape |",
-          f"| B - anti-crowd | **{fmt_ticket(set_b)}** | numbers human players under-pick; no overlap with A |", ""]
+          f"| A - pattern | **{show(set_a, "extra_a")}** | top ensemble score (long-run + recent frequency, overdue) with a typical sum/odd-even shape |",
+          f"| B - anti-crowd | **{show(set_b, "extra_b")}** | numbers human players under-pick; no overlap with A |", ""]
 
     L += ["### 1. Observe - is anything non-random?", "",
           "| Statistic | Observed | Fair-draw 95% range | p |", "|---|---|---|---|"]
     for t in obs["tests"]:
         flag = " (!)" if t["p"] < 0.05 else ""
         L.append(f"| {t['label']} | {t['observed']:.2f} | {t['null_lo']:.2f} - {t['null_hi']:.2f} | {t['p']:.2f}{flag} |")
-    L += ["", (f"{len(sig)} of {len(TESTS)} statistics fall outside the fair-draw range at p<0.05 "
-               f"(about {0.05 * len(TESTS):.1f} expected by chance alone)."), ""]
+    L += ["", (f"{len(sig)} of {len(obs['tests'])} statistics fall outside the fair-draw range at p<0.05 "
+               f"(about {0.05 * len(obs['tests']):.1f} expected by chance alone)."), ""]
 
     L += ["Hot numbers (drawn more than expected):", "", "```"]
     L += [f"{n:>2}  {c:>3}x  z={zz:+.2f}  {bar(c, counts.max())}" for n, c, zz in hot]
@@ -406,6 +443,7 @@ def run_game(game: str, sims: int, seed_extra: str, today: dt.date) -> tuple[dic
         "game": cfg["label"], "next_draw": draw_date, "draws_analysed": len(dates),
         "data_range": [dates[0], dates[-1]], "pool": pool_now, "jackpot_odds": odds,
         "set_a_pattern": set_a, "set_b_anticrowd": set_b,
+        **({"extra_name": extra["name"], "extra_a": picks["extra_a"], "extra_b": picks["extra_b"]} if extra else {}),
         "tests": obs["tests"], "backtest": bt,
         "hot": hot, "cold": cold, "overdue": overdue,
     }
@@ -428,7 +466,7 @@ def main():
     flags = [f"{r['game']}: {t['label']} (p={t['p']:.2f})"
              for r in results.values() for t in r["tests"] if t["p"] < 0.05]
     edges = [f"{r['game']}: {b['strategy']}" for r in results.values() for b in r["backtest"] if abs(b["z"]) > 2.5]
-    n_tests = len(TESTS) * len(results)
+    n_tests = sum(len(r["tests"]) for r in results.values())
     verdict = (
         f"Of {n_tests} pattern statistics, {len(flags)} fall outside the fair-draw range at p<0.05 "
         f"(about {0.05 * n_tests:.1f} expected from noise alone)"
@@ -437,7 +475,7 @@ def main():
            "Strategies flagged for re-testing: " + ", ".join(edges) + ". ")
     )
     head = [
-        "# OLG Lotto Max & Lotto 6/49 - analyst report", "",
+        "# OLG Lotto Max, Lotto 6/49 & Daily Grand - analyst report", "",
         f"Generated {today.isoformat()} by `analyze.py` from `data/*.csv` (refresh with `fetch.py`).", "",
         "**Read this first.** " + verdict
         + "Unless a strategy is flagged above, Set A has the same chance of winning as any other ticket. "
@@ -448,8 +486,9 @@ def main():
 
     for res in results.values():
         print(f"{res['game']}  (next draw {res['next_draw']}, {res['draws_analysed']} draws analysed)")
-        print(f"  Set A pattern    : {fmt_ticket(res['set_a_pattern'])}")
-        print(f"  Set B anti-crowd : {fmt_ticket(res['set_b_anticrowd'])}")
+        for name, key, ex in (("A pattern   ", "set_a_pattern", "extra_a"), ("B anti-crowd", "set_b_anticrowd", "extra_b")):
+            tail = f"  + {res['extra_name']} {res[ex]}" if "extra_name" in res else ""
+            print(f"  Set {name} : {fmt_ticket(res[key])}{tail}")
     print("Full analysis: report.md")
 
 

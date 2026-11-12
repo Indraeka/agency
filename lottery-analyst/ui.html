@@ -22,7 +22,7 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink);
          font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
-  main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 64px; }
+  main { max-width: 1320px; margin: 0 auto; padding: 28px 16px 64px; }
   header { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; }
   h1 { font: 700 30px/1.1 ui-serif, Georgia, serif; margin: 0; letter-spacing: -0.01em; }
   h2 { font: 700 21px/1.2 ui-serif, Georgia, serif; margin: 0; }
@@ -38,7 +38,7 @@
           padding: 11px 15px; margin: 20px 0 0; font-size: 14.5px; }
   #status { min-height: 24px; margin: 14px 2px 0; font-size: 14.5px; color: var(--muted); }
   #status.error { color: var(--bad); font-weight: 600; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px; margin-top: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr)); gap: 18px; margin-top: 12px; }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
   .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
   .next { font-size: 14px; color: var(--muted); }
@@ -52,8 +52,13 @@
           font-weight: 700; font-variant-numeric: tabular-nums; background: var(--ball); }
   .set.a .ball { background: var(--a); color: var(--accent-ink); }
   .set.b .ball { background: var(--b); color: #fff; }
-  .small .ball { width: 30px; height: 30px; font-size: 13px; }
+  .small .ball { width: 28px; height: 28px; font-size: 12.5px; }
+  .small.balls { gap: 5px; }
   .ball.bonus { background: transparent; border: 1.5px dashed var(--muted); color: var(--muted); }
+  .ball.extra { background: var(--surface) !important; color: var(--ink) !important; border: 2.5px solid currentColor; }
+  .set.a .ball.extra { border-color: var(--a); } .set.b .ball.extra { border-color: var(--b); }
+  .ball.extra.hit { background: var(--hit) !important; color: var(--hit-ink) !important; border-color: var(--hit); }
+  .plus { align-self: center; color: var(--muted); font-size: 13px; padding: 0 2px; }
   .ball.hit { background: var(--hit); color: var(--hit-ink); }
   .ball.miss { background: var(--ball); color: var(--muted); }
   td .balls { flex-wrap: nowrap; }
@@ -125,15 +130,19 @@ function balls(nums, opts = {}) {
     if (opts.drawn) cls += opts.drawn.includes(n) ? " hit" : " miss";
     wrap.append(el("span", cls, String(n).padStart(2, "0")));
   }
-  if (opts.bonus != null) { const b = el("span", "ball bonus", String(opts.bonus).padStart(2, "0")); b.title = "Bonus number"; wrap.append(b); }
+  if (opts.bonus != null) { const b = el("span", "ball bonus", String(opts.bonus).padStart(2, "0")); b.title = opts.bonusName || "Bonus number"; wrap.append(b); }
+  if (opts.extra != null) {
+    wrap.append(el("span", "plus", opts.extraLabel || "+"));
+    const x = el("span", "ball extra" + (opts.extraHit ? " hit" : ""), String(opts.extra).padStart(2, "0")); x.title = opts.extraName; wrap.append(x);
+  }
   return wrap;
 }
 
-function setBlock(kind, title, why, nums) {
+function setBlock(kind, title, why, nums, extra, extraName) {
   const box = el("div", "set " + kind);
   const label = el("div", "set-label", title);
   label.append(el("span", null, why));
-  box.append(label, balls(nums));
+  box.append(label, balls(nums, { extra, extraName, extraLabel: extraName ? "+ " + extraName.split(" ")[0] : null }));
   return box;
 }
 
@@ -153,8 +162,8 @@ function render() {
 
     const p = picks && picks[id];
     if (p) {
-      card.append(setBlock("a", "Set A · pattern", "frequency and overdue score", p.set_a));
-      card.append(setBlock("b", "Set B · anti-crowd", "numbers others under-pick", p.set_b));
+      card.append(setBlock("a", "Set A · pattern", "frequency and overdue score", p.set_a, p.extra_a, g.extra && g.extra.name));
+      card.append(setBlock("b", "Set B · anti-crowd", "numbers others under-pick", p.set_b, p.extra_b, g.extra && g.extra.name));
       card.append(el("p", "meta", `Based on ${p.based_on_draws} draws up to ${fmtDate(p.last_draw)}.`));
     } else {
       card.append(el("p", "empty", "No numbers yet for this draw. Press Generate numbers."));
@@ -164,10 +173,10 @@ function render() {
     for (const d of g.recent) {
       const row = el("div", "draw");
       const t = el("time", null, fmtDate(d.date)); t.dateTime = d.date;
-      row.append(t, balls(d.main, { small: true, bonus: d.bonus }));
+      row.append(t, balls(d.main, { small: true, bonus: d.bonus, bonusName: g.extra && g.extra.name }));
       card.append(row);
     }
-    card.append(el("p", "meta", `${g.draws} draws on file since ${fmtDate(g.first, { year: "numeric", month: "short" })} · ${g.k} numbers from 1–${g.pool}`));
+    card.append(el("p", "meta", `${g.draws} draws on file since ${fmtDate(g.first, { year: "numeric", month: "short" })} · ${g.k} numbers from 1–${g.pool}` + (g.extra ? ` plus a ${g.extra.name} from 1–${g.extra.pool}` : "")));
     games.append(card);
   }
   $("fresh").textContent = "Results on file: " + lasts.join(" · ");
@@ -185,9 +194,9 @@ function renderHistory(history) {
     for (const [key, name] of [["set_a", "A"], ["set_b", "B"]]) {
       const tr = el("tr");
       tr.append(el("td", "num", fmtDate(h.draw_date)), el("td", null, h.label), el("td", null, name));
-      const nums = el("td"); nums.append(balls(h[key], { small: true, drawn: h.drawn ? h.drawn.main : null })); tr.append(nums);
+      const nums = el("td"); nums.append(balls(h[key], { small: true, drawn: h.drawn ? h.drawn.main : null, extra: h[key === "set_a" ? "extra_a" : "extra_b"], extraName: "Grand Number", extraHit: h.drawn && h[key + "_bonus"] })); tr.append(nums);
       let result = "Waiting for draw";
-      if (h.drawn) result = `${h[key + "_matches"]} of ${h[key].length} matched` + (h[key + "_bonus"] ? " + bonus" : "");
+      if (h.drawn) result = `${h[key + "_matches"]} of ${h[key].length} matched` + (h[key + "_bonus"] ? (h.extra_a != null ? " + Grand Number" : " + bonus") : "");
       tr.append(el("td", "num", result));
       table.append(tr);
     }
@@ -209,6 +218,7 @@ async function busy(button, label, fn) {
   buttons.forEach((b) => (b.disabled = true)); button.textContent = label;
   try { await fn(); } catch (e) { setStatus("Failed: " + e.message, true); }
   buttons.forEach((b) => (b.disabled = false)); button.textContent = old;
+  if (current.state) labelGenerate();
 }
 
 /* Show saved picks for the upcoming draw, if this dataset already has some. */
@@ -217,10 +227,14 @@ function adoptSavedPicks() {
   for (const [id, g] of Object.entries(current.state.games)) {
     const h = current.state.history.find((x) => x.game === id && x.draw_date === g.next_draw && !x.drawn);
     current.variants[id] = h ? h.variant : -1;
-    if (h) picks[id] = { set_a: h.set_a, set_b: h.set_b, based_on_draws: g.draws, last_draw: g.last };
+    if (h) picks[id] = { set_a: h.set_a, set_b: h.set_b, extra_a: h.extra_a, extra_b: h.extra_b, based_on_draws: g.draws, last_draw: g.last };
   }
   current.picks = Object.keys(picks).length ? picks : null;
-  const all = Object.keys(picks).length === Object.keys(current.state.games).length;
+  labelGenerate();
+}
+
+function labelGenerate() {
+  const all = Object.keys(current.state.games).every((id) => (current.variants[id] ?? -1) >= 0);
   $("generate").textContent = all ? "Generate another pair" : "Generate numbers";
 }
 
@@ -242,14 +256,16 @@ $("refresh").onclick = () => busy($("refresh"), "Checking…", async () => {
 });
 
 $("generate").onclick = () => busy($("generate"), "Generating…", async () => {
+  /* Fill in games that have no pair yet; only when all have one, replace them all. */
+  const ids = Object.keys(current.state.games);
+  const missing = ids.filter((id) => (current.variants[id] ?? -1) < 0);
   const next = {};
-  for (const id of Object.keys(current.state.games)) next[id] = (current.variants[id] ?? -1) + 1;
+  for (const id of missing.length ? missing : ids) next[id] = (current.variants[id] ?? -1) + 1;
   const data = await call("/api/generate", { variants: next });
   current.state = data.state;
-  adoptSavedPicks(); current.picks = data.picks; render();
-  const fresh = Object.values(next).every((v) => v === 0);
-  setStatus(fresh ? "Generated a pair for each game and saved it to the track record."
-                  : "Generated a new pair. It replaces the saved pair for each upcoming draw.");
+  adoptSavedPicks(); render();
+  setStatus(missing.length ? "Generated a pair for " + missing.map((id) => current.state.games[id].label).join(", ") + " and saved it to the track record."
+                           : "Generated a new pair for every game. They replace the saved pairs for the upcoming draws.");
 });
 
 async function loadEvidence() {

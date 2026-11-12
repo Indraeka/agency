@@ -1,8 +1,8 @@
-# OLG Lotto Max & Lotto 6/49 - analyst report
+# OLG Lotto Max, Lotto 6/49 & Daily Grand - analyst report
 
-Generated 2026-11-11 by `analyze.py` from `data/*.csv` (refresh with `fetch.py`).
+Generated 2026-11-12 by `analyze.py` from `data/*.csv` (refresh with `fetch.py`).
 
-**Read this first.** Of 16 pattern statistics, 1 fall outside the fair-draw range at p<0.05 (about 0.8 expected from noise alone): Lotto Max: Frequency chi-square (are some numbers favoured?) (p=0.04). No strategy back-tests better than chance. Unless a strategy is flagged above, Set A has the same chance of winning as any other ticket. Set B also has the same chance of winning, but is built so that a win is less likely to be split.
+**Read this first.** Of 25 pattern statistics, 1 fall outside the fair-draw range at p<0.05 (about 1.2 expected from noise alone): Lotto Max: Frequency chi-square (are some numbers favoured?) (p=0.04). No strategy back-tests better than chance. Unless a strategy is flagged above, Set A has the same chance of winning as any other ticket. Set B also has the same chance of winning, but is built so that a win is less likely to be split.
 
 ## Lotto Max
 
@@ -80,7 +80,7 @@ No strategy differs from random by more than noise (|z| < 2.5 for all).
 - Draws analysed: **313** (2023-11-11 to 2026-11-07), 6 main numbers from 1-49
 - Jackpot odds per line: 1 in 13,983,816
 
-### Picks for the 2026-11-11 draw
+### Picks for the 2026-11-14 draw
 
 | Set | Numbers | Basis |
 |---|---|---|
@@ -142,6 +142,77 @@ Walk-forward over the last 213 draws; each pick uses only earlier draws.
 | cold | 0.765 | 0.735 | +0.59 | 3 of 6 |
 | overdue | 0.723 | 0.735 | -0.22 | 3 of 6 |
 | ensemble | 0.737 | 0.735 | +0.05 | 3 of 6 |
+
+No strategy differs from random by more than noise (|z| < 2.5 for all).
+
+## Daily Grand
+
+- Draws analysed: **316** (2023-11-02 to 2026-11-09), 5 main numbers from 1-49
+- Jackpot odds per line: 1 in 13,348,188
+
+### Picks for the 2026-11-12 draw
+
+| Set | Numbers | Basis |
+|---|---|---|
+| A - pattern | **06 25 36 37 42 + Grand Number 6** | top ensemble score (long-run + recent frequency, overdue) with a typical sum/odd-even shape |
+| B - anti-crowd | **20 40 41 45 47 + Grand Number 3** | numbers human players under-pick; no overlap with A |
+
+### 1. Observe - is anything non-random?
+
+| Statistic | Observed | Fair-draw 95% range | p |
+|---|---|---|---|
+| Frequency chi-square (are some numbers favoured?) | 49.78 | 28.25 - 62.62 | 0.49 |
+| Most extreme hot/cold number, |z| | 3.11 | 1.81 - 3.67 | 0.23 |
+| Numbers repeated from previous draw (avg) | 0.47 | 0.44 - 0.58 | 0.24 |
+| Most frequent pair, times drawn together | 9.00 | 8.00 - 11.00 | 1.00 |
+| Average sum of main numbers | 127.29 | 121.70 - 128.41 | 0.19 |
+| Spread (SD) of sums | 29.83 | 28.07 - 32.41 | 0.75 |
+| Average count of odd numbers | 2.60 | 2.43 - 2.67 | 0.39 |
+| Share of draws with a consecutive pair | 0.32 | 0.31 - 0.41 | 0.20 |
+| Grand Number frequency chi-square | 8.61 | 1.22 - 14.51 | 0.38 |
+
+0 of 9 statistics fall outside the fair-draw range at p<0.05 (about 0.5 expected by chance alone).
+
+Hot numbers (drawn more than expected):
+
+```
+42   49x  z=+3.11  ########################
+37   46x  z=+2.56  #######################
+25   40x  z=+1.44  ####################
+ 5   39x  z=+1.26  ###################
+18   38x  z=+1.07  ###################
+33   38x  z=+1.07  ###################
+45   38x  z=+1.07  ###################
+ 6   37x  z=+0.88  ##################
+```
+
+Cold numbers (drawn less than expected):
+
+```
+40   18x  z=-2.65  #########
+15   23x  z=-1.72  ###########
+ 9   23x  z=-1.72  ###########
+ 4   23x  z=-1.72  ###########
+38   24x  z=-1.53  ############
+34   25x  z=-1.35  ############
+26   25x  z=-1.35  ############
+16   25x  z=-1.35  ############
+```
+
+Most overdue (draws since last seen): 47 (29), 11 (28), 4 (26), 15 (24), 49 (23), 12 (22), 23 (20), 34 (20)
+
+Most frequent pairs: 37-42 (9x), 28-42 (9x), 25-42 (9x), 21-37 (9x), 35-45 (8x)
+
+### 2. Learn - does any strategy beat random?
+
+Walk-forward over the last 216 draws; each pick uses only earlier draws.
+
+| Strategy | Avg matches/ticket | Random expectation | z | Best single ticket |
+|---|---|---|---|---|
+| hot | 0.556 | 0.510 | +1.03 | 2 of 5 |
+| cold | 0.486 | 0.510 | -0.55 | 2 of 5 |
+| overdue | 0.551 | 0.510 | +0.92 | 2 of 5 |
+| ensemble | 0.551 | 0.510 | +0.92 | 2 of 5 |
 
 No strategy differs from random by more than noise (|z| < 2.5 for all).
 
