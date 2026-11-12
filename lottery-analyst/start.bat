@@ -8,6 +8,7 @@ where py >nul 2>nul && set PY=py -3
   pause
   exit /b 1
 )
+%PY% -c "import certifi" 2>nul || %PY% -m pip install certifi >nul 2>nul
 %PY% -c "import numpy" 2>nul || %PY% -m pip install numpy || (
   echo Could not install numpy. Run:  %PY% -m pip install numpy
   pause

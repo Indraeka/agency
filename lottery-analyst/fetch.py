@@ -17,6 +17,9 @@ import argparse
 import csv
 import datetime as dt
 import re
+import shutil
+import ssl
+import subprocess
 import sys
 import time
 import urllib.parse
@@ -39,14 +42,49 @@ ARCHIVE_PAGE = {"dailygrand": "dailygrand-winningnumbers"}
 SEPARATE_EXTRA = {"dailygrand"}
 
 
+def _ssl_context() -> ssl.SSLContext:
+    """Certificate store for HTTPS. Python on macOS often ships without one,
+    so prefer the `certifi` bundle when it is installed."""
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context()
+
+
+def _is_cert_error(exc: Exception) -> bool:
+    return isinstance(exc, ssl.SSLCertVerificationError) or isinstance(
+        getattr(exc, "reason", None), ssl.SSLCertVerificationError)
+
+
+def _http_curl(url: str, data: dict | None) -> str:
+    """Download with the system `curl`, which uses the operating system's own
+    certificate store. Verification stays on."""
+    cmd = ["curl", "-sS", "--fail", "--location", "--max-time", "40", "-A", UA]
+    if data:
+        cmd += ["--data", urllib.parse.urlencode(data)]
+    out = subprocess.run(cmd + [url], capture_output=True, timeout=60)
+    if out.returncode:
+        raise OSError(f"curl failed for {url}: {out.stderr.decode('utf-8', 'replace').strip()}")
+    return out.stdout.decode("utf-8", "replace")
+
+
 def http(url: str, data: dict | None = None, tries: int = 4) -> str:
     body = urllib.parse.urlencode(data).encode() if data else None
     for attempt in range(tries):
         try:
             req = urllib.request.Request(url, data=body, headers={"User-Agent": UA})
-            with urllib.request.urlopen(req, timeout=40) as r:
+            with urllib.request.urlopen(req, timeout=40, context=_ssl_context()) as r:
                 return r.read().decode("utf-8", "replace")
         except Exception as exc:  # noqa: BLE001 - retry any transport error
+            if _is_cert_error(exc):
+                # Python has no usable certificate store here (common on macOS).
+                if shutil.which("curl"):
+                    return _http_curl(url, data)
+                raise OSError(
+                    "Python cannot verify secure connections on this computer. "
+                    "Fix: run  python3 -m pip install certifi  and start the app again."
+                ) from exc
             if attempt == tries - 1:
                 raise
             print(f"  retry {url}: {exc}", file=sys.stderr)
